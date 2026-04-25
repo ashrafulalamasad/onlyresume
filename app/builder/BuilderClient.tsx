@@ -238,10 +238,35 @@ function TemplatePreviewCard({ templateId }: { templateId: ResumeData['template'
   const Template = templateId === 'corporate' ? CorporateTemplate
     : templateId === 'modern' ? ModernTemplate
     : MinimalTemplate
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    function updateScale() {
+      if (!containerRef.current) return
+      const containerWidth = containerRef.current.clientWidth
+      const containerHeight = containerRef.current.clientHeight
+      const pageWidth = 794
+      const pageHeight = 1123
+      const scaleX = containerWidth / pageWidth
+      const scaleY = containerHeight / pageHeight
+      setScale(Math.min(scaleX, scaleY, 1))
+    }
+
+    updateScale()
+    const observer = new ResizeObserver(updateScale)
+    if (containerRef.current) observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <div className="origin-top-left" style={{ width: 794, height: 1123, transform: 'scale(0.28)', transformOrigin: 'top left' }}>
-      <Template data={previewData} />
+    <div ref={containerRef} className="w-full h-full flex items-center justify-center bg-gray-50">
+      <div
+        className="origin-center shadow-sm"
+        style={{ transform: `scale(${scale})`, width: 794, height: 1123 }}
+      >
+        <Template data={previewData} />
+      </div>
     </div>
   )
 }
@@ -1407,3 +1432,5 @@ export default function BuilderClient() {
     </>
   )
 }
+
+export { MinimalTemplate, CorporateTemplate, ModernTemplate, sampleResumeData }
