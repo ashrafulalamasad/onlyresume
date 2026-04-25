@@ -313,7 +313,7 @@ function TemplateSelectionScreen({ data, onChange, onContinue }: {
                 : 'border-border hover:border-accent/50 hover:shadow-md'
             }`}
           >
-            <div className="aspect-[210/297] overflow-hidden border-b border-border">
+            <div className="aspect-[210/297] overflow-hidden border-b border-border" data-nosnippet aria-hidden="true">
               <TemplatePreviewCard templateId={t.id} />
             </div>
             <div className="p-4">

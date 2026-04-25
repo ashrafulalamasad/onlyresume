@@ -78,7 +78,7 @@ export default function TemplatesPage() {
       <div className="mt-8 grid gap-6 sm:mt-12 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
         {templates.map((t) => (
           <div key={t.id} className="overflow-hidden rounded-xl border border-border bg-surface">
-            <div className="aspect-[210/297] overflow-hidden border-b border-border bg-gray-50">
+            <div className="aspect-[210/297] overflow-hidden border-b border-border bg-gray-50" data-nosnippet aria-hidden="true">
               <TemplatePreview templateId={t.id as 'minimal' | 'corporate' | 'modern'} />
             </div>
             <div className="p-5">
