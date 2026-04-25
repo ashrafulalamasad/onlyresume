@@ -12,6 +12,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://onlyresume.vercel.app'),
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  },
   title: {
     default: 'OnlyResume — Free Online Resume Builder | No Signup Required',
     template: '%s | OnlyResume',

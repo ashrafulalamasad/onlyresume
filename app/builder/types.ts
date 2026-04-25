@@ -4,11 +4,17 @@ export interface PersonalInfo {
   phone: string
   location: string
   summary: string
+  professionTitle: string
+  linkedinUrl: string
+  githubUrl: string
+  portfolioUrl: string
 }
 
 export interface ExperienceItem {
   id: string
   company: string
+  city: string
+  state: string
   title: string
   startDate: string
   endDate: string
@@ -21,6 +27,28 @@ export interface EducationItem {
   degree: string
   startDate: string
   endDate: string
+  gpa: string
+}
+
+export interface ProjectItem {
+  id: string
+  title: string
+  techStack: string
+  description: string
+  liveLink: string
+}
+
+export interface LanguageItem {
+  id: string
+  language: string
+  proficiency: 'Native' | 'Fluent' | 'Intermediate' | 'Basic'
+}
+
+export interface CertificationItem {
+  id: string
+  name: string
+  issuer: string
+  date: string
 }
 
 export interface ResumeData {
@@ -28,10 +56,13 @@ export interface ResumeData {
   experience: ExperienceItem[]
   education: EducationItem[]
   skills: string[]
+  projects: ProjectItem[]
+  languages: LanguageItem[]
+  certifications: CertificationItem[]
   template: 'minimal' | 'corporate' | 'modern'
 }
 
-export type FormStep = 'personal' | 'experience' | 'education' | 'skills'
+export type FormStep = 'template' | 'personal' | 'experience' | 'education' | 'skills' | 'projects' | 'languages' | 'certifications'
 
 export const defaultResumeData: ResumeData = {
   personal: {
@@ -40,9 +71,16 @@ export const defaultResumeData: ResumeData = {
     phone: '',
     location: '',
     summary: '',
+    professionTitle: '',
+    linkedinUrl: '',
+    githubUrl: '',
+    portfolioUrl: '',
   },
   experience: [],
   education: [],
   skills: [],
+  projects: [],
+  languages: [],
+  certifications: [],
   template: 'minimal',
 }

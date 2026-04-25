@@ -39,6 +39,8 @@ body {
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
   }
 
   .no-print {
@@ -47,21 +49,31 @@ body {
 
   .print-only {
     display: block !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 210mm;
-    min-height: 297mm;
+    position: static;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
     background: white;
   }
 
+  .hidden {
+    display: none;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
   .resume-page {
-    width: 210mm;
-    min-height: 297mm;
-    padding: 12mm 14mm;
+    width: 100%;
+    height: auto;
+    padding: 0;
     margin: 0;
     box-shadow: none !important;
     transform: none !important;
+    page-break-after: always;
+    page-break-inside: avoid;
   }
 }
 
@@ -80,4 +92,20 @@ body {
 
 .animate-scan-pulse {
   animation: scan-pulse 1.5s ease-in-out infinite;
+}
+
+@media (min-width: 1024px) {
+  .section-nav::-webkit-scrollbar {
+    width: 4px;
+  }
+  .section-nav::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+  }
+}
+
+@media (max-width: 767px) {
+  .preview-container {
+    height: auto !important;
+  }
 }

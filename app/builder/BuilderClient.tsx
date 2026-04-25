@@ -1,23 +1,99 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import type { ResumeData, FormStep, ExperienceItem, EducationItem } from './types'
+import type { ResumeData, FormStep, ExperienceItem, EducationItem, ProjectItem, LanguageItem, CertificationItem } from './types'
 import { defaultResumeData } from './types'
 
 const STORAGE_KEY = 'onlyresume-data'
 
-const STEPS: { key: FormStep; label: string }[] = [
+const PROGRESS_STEPS = [
+  { label: 'Select Template', number: 1 },
+  { label: 'Add Your Info', number: 2 },
+  { label: 'Add Sections', number: 3 },
+  { label: 'Download PDF', number: 4 },
+]
+
+const SECTION_NAV: { key: FormStep; label: string }[] = [
   { key: 'personal', label: 'Personal' },
   { key: 'experience', label: 'Experience' },
   { key: 'education', label: 'Education' },
   { key: 'skills', label: 'Skills' },
+  { key: 'projects', label: 'Projects' },
+  { key: 'languages', label: 'Languages' },
+  { key: 'certifications', label: 'Certifications' },
 ]
 
 function generateId() {
   return Math.random().toString(36).slice(2, 10)
 }
 
-// ─── Download Modal ───────────────────────────────────────────
+function migrateResumeData(raw: Record<string, unknown>): ResumeData {
+  const d = raw as Record<string, unknown>
+  const personal = (d.personal ?? {}) as Record<string, unknown>
+  const experience = (d.experience ?? []) as Record<string, unknown>[]
+  const education = (d.education ?? []) as Record<string, unknown>[]
+  const projects = (d.projects ?? []) as Record<string, unknown>[]
+  const languages = (d.languages ?? []) as Record<string, unknown>[]
+  const certifications = (d.certifications ?? []) as Record<string, unknown>[]
+  return {
+    personal: {
+      fullName: (personal.fullName as string) ?? '',
+      email: (personal.email as string) ?? '',
+      phone: (personal.phone as string) ?? '',
+      location: (personal.location as string) ?? '',
+      summary: (personal.summary as string) ?? '',
+      professionTitle: (personal.professionTitle as string) ?? '',
+      linkedinUrl: (personal.linkedinUrl as string) ?? '',
+      githubUrl: (personal.githubUrl as string) ?? '',
+      portfolioUrl: (personal.portfolioUrl as string) ?? '',
+    },
+    experience: experience.map((exp) => ({
+      id: (exp.id as string) ?? generateId(),
+      company: (exp.company as string) ?? '',
+      city: (exp.city as string) ?? '',
+      state: (exp.state as string) ?? '',
+      title: (exp.title as string) ?? '',
+      startDate: (exp.startDate as string) ?? '',
+      endDate: (exp.endDate as string) ?? '',
+      description: (exp.description as string) ?? '',
+    })),
+    education: education.map((edu) => ({
+      id: (edu.id as string) ?? generateId(),
+      school: (edu.school as string) ?? '',
+      degree: (edu.degree as string) ?? '',
+      startDate: (edu.startDate as string) ?? '',
+      endDate: (edu.endDate as string) ?? '',
+      gpa: (edu.gpa as string) ?? '',
+    })),
+    skills: (d.skills as string[]) ?? [],
+    projects: projects.map((p) => ({
+      id: (p.id as string) ?? generateId(),
+      title: (p.title as string) ?? '',
+      techStack: (p.techStack as string) ?? '',
+      description: (p.description as string) ?? '',
+      liveLink: (p.liveLink as string) ?? '',
+    })),
+    languages: languages.map((l) => ({
+      id: (l.id as string) ?? generateId(),
+      language: (l.language as string) ?? '',
+      proficiency: (['Native', 'Fluent', 'Intermediate', 'Basic'].includes(l.proficiency as string)
+        ? l.proficiency as LanguageItem['proficiency']
+        : 'Intermediate'),
+    })),
+    certifications: certifications.map((c) => ({
+      id: (c.id as string) ?? generateId(),
+      name: (c.name as string) ?? '',
+      issuer: (c.issuer as string) ?? '',
+      date: (c.date as string) ?? '',
+    })),
+    template: (['minimal', 'corporate', 'modern'].includes(d.template as string)
+      ? d.template as ResumeData['template']
+      : 'minimal'),
+  }
+}
+
+
+// ─── Modals ──────────────────────────────────────────────────
 
 function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownload: () => void }) {
   const [phase, setPhase] = useState<'scanning' | 'ready'>('scanning')
@@ -40,10 +116,10 @@ function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownloa
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-primary">Scanning for errors...</h3>
+            <h3 className="text-xl font-bold text-primary">Generating PDF...</h3>
             <p className="mt-2 text-sm text-foreground">Checking formatting and structure</p>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full w-full origin-left animate-[scan-bar_2s_ease-in-out] rounded-full bg-accent" style={{ animation: 'scan-bar 2s ease-in-out forwards' }} />
+              <div className="h-full w-full origin-left rounded-full bg-accent" style={{ animation: 'scan-bar 2s ease-in-out forwards' }} />
             </div>
           </>
         ) : (
@@ -53,12 +129,15 @@ function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownloa
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-primary">Resume Ready!</h3>
+            <h3 className="text-xl font-bold text-primary">Your PDF is Ready!</h3>
             <p className="mt-2 text-sm text-foreground">Your resume looks great. No issues found.</p>
             <button
               onClick={onDownload}
-              className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-lg bg-accent text-base font-semibold text-white transition-colors hover:bg-accent/90"
+              className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-green-600 text-base font-semibold text-white transition-colors hover:bg-green-700"
             >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
               Download PDF
             </button>
             <button
@@ -81,18 +160,184 @@ function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownloa
   )
 }
 
+function ConfirmResetModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div
+        className="w-full max-w-sm rounded-2xl bg-white p-8 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+          <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-primary">Clear All Data?</h3>
+        <p className="mt-2 text-sm text-foreground">
+          Are you sure you want to clear all your saved data? This cannot be undone.
+        </p>
+        <button
+          onClick={onConfirm}
+          className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-lg bg-red-600 text-base font-semibold text-white transition-colors hover:bg-red-700"
+        >
+          Yes, Clear
+        </button>
+        <button
+          onClick={onClose}
+          className="mt-3 text-sm text-foreground hover:text-primary"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Template Selection Screen ───────────────────────────────
+
+const sampleResumeData: ResumeData = {
+  personal: {
+    fullName: 'Ashraful Alam',
+    professionTitle: 'Senior Software Engineer',
+    email: 'ashraful@example.com',
+    phone: '+880 1700-000000',
+    location: 'Dhaka, Bangladesh',
+    summary: 'Passionate software engineer with 5+ years of experience building scalable web applications. Specialized in React, Node.js, and cloud architecture. Led cross-functional teams to deliver products serving 100K+ users. Strong advocate for clean code, test-driven development, and agile methodologies.',
+    linkedinUrl: 'linkedin.com/in/ashraful',
+    githubUrl: 'github.com/ashraful',
+    portfolioUrl: 'ashraful.dev',
+  },
+  experience: [
+    { id: '1', title: 'Senior Software Engineer', company: 'Brain Station 23', city: 'Dhaka', state: '', startDate: 'Jan 2022', endDate: 'Present', description: '• Architected microservices handling 50K+ daily requests using Node.js and AWS\n• Mentored 4 junior developers and led code review processes\n• Reduced API response time by 40% through query optimization and caching\n• Designed and implemented real-time notification system using WebSockets' },
+    { id: '2', title: 'Software Engineer', company: 'TechVentures Ltd', city: 'Dhaka', state: '', startDate: 'Jun 2019', endDate: 'Dec 2021', description: '• Built RESTful APIs serving mobile and web clients with 99.9% uptime\n• Implemented CI/CD pipelines reducing deployment time by 60%\n• Collaborated with product team to deliver 12 feature releases on schedule' },
+    { id: '3', title: 'Junior Developer', company: 'CodeCraft Solutions', city: 'Dhaka', state: '', startDate: 'Jan 2018', endDate: 'May 2019', description: '• Developed responsive front-end interfaces using React and TypeScript\n• Wrote unit and integration tests achieving 85% code coverage' },
+  ],
+  education: [
+    { id: '1', school: 'University of Dhaka', degree: 'B.Sc. in Computer Science & Engineering', startDate: 'Jan 2014', endDate: 'Dec 2017', gpa: '3.7 / 4.0' },
+    { id: '2', school: 'Dhaka City College', degree: 'Higher Secondary Certificate (HSC)', startDate: 'Jun 2011', endDate: 'May 2013', gpa: '' },
+  ],
+  skills: ['JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'Git', 'REST APIs', 'GraphQL'],
+  projects: [
+    { id: '1', title: 'E-Commerce Platform', techStack: 'Next.js, Stripe, PostgreSQL, Redis', description: '• Full-stack marketplace with real-time inventory tracking and payment processing\n• Handles 10K+ monthly transactions with automated order management', liveLink: 'shopapp.dev' },
+    { id: '2', title: 'Task Management App', techStack: 'React, Node.js, Socket.io, MongoDB', description: '• Real-time collaborative task board with drag-and-drop interface\n• Supports team workspaces, file attachments, and activity logging', liveLink: 'taskflow.io' },
+  ],
+  languages: [
+    { id: '1', language: 'Bengali', proficiency: 'Native' },
+    { id: '2', language: 'English', proficiency: 'Fluent' },
+    { id: '3', language: 'Hindi', proficiency: 'Intermediate' },
+  ],
+  certifications: [
+    { id: '1', name: 'AWS Certified Solutions Architect', issuer: 'Amazon Web Services', date: 'Mar 2023' },
+    { id: '2', name: 'Meta Front-End Developer Certificate', issuer: 'Meta / Coursera', date: 'Aug 2021' },
+  ],
+  template: 'minimal',
+}
+
+function TemplatePreviewCard({ templateId }: { templateId: ResumeData['template'] }) {
+  const previewData = { ...sampleResumeData, template: templateId }
+  const Template = templateId === 'corporate' ? CorporateTemplate
+    : templateId === 'modern' ? ModernTemplate
+    : MinimalTemplate
+
+  return (
+    <div className="origin-top-left" style={{ width: 794, height: 1123, transform: 'scale(0.28)', transformOrigin: 'top left' }}>
+      <Template data={previewData} />
+    </div>
+  )
+}
+
+function TemplateSelectionScreen({ data, onChange, onContinue }: {
+  data: ResumeData
+  onChange: (d: ResumeData) => void
+  onContinue: () => void
+}) {
+  const templates = [
+    {
+      id: 'minimal' as const,
+      name: 'Classic',
+      description: 'Clean and simple. Lets your content speak for itself with elegant whitespace and subtle accent lines.',
+    },
+    {
+      id: 'corporate' as const,
+      name: 'Modern Sidebar',
+      description: 'Bold sidebar layout with a dark panel for contact details. Perfect for corporate and executive roles.',
+    },
+    {
+      id: 'modern' as const,
+      name: 'Corporate Header',
+      description: 'Full-width colored header with bold section dividers. Ideal for creative and tech professionals.',
+    },
+  ]
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-primary sm:text-3xl">Select Your Template</h2>
+        <p className="mt-2 text-sm text-foreground sm:text-base">
+          Choose a design that best represents your professional brand.
+        </p>
+      </div>
+      <div className="mt-8 grid gap-6 sm:grid-cols-3">
+        {templates.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => onChange({ ...data, template: t.id })}
+            className={`group overflow-hidden rounded-xl border-2 bg-surface text-left transition-all ${
+              data.template === t.id
+                ? 'border-accent ring-2 ring-accent/20 shadow-lg'
+                : 'border-border hover:border-accent/50 hover:shadow-md'
+            }`}
+          >
+            <div className="aspect-[210/297] overflow-hidden border-b border-border">
+              <TemplatePreviewCard templateId={t.id} />
+            </div>
+            <div className="p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-primary">{t.name}</h3>
+                {data.template === t.id && (
+                  <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
+                    Selected
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-foreground">{t.description}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+      <div className="mt-8 text-center">
+        <button
+          onClick={onContinue}
+          className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-accent px-8 text-base font-semibold text-white transition-colors hover:bg-accent/90"
+        >
+          Continue to Resume Data
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Resume Preview Templates ────────────────────────────────
 
 function MinimalTemplate({ data }: { data: ResumeData }) {
-  const { personal, experience, education, skills } = data
+  const { personal, experience, education, skills, projects, languages, certifications } = data
   return (
     <div className="resume-page p-[48px]">
-      <div className="border-b-2 border-[#2563EB] pb-4">
+      <div className="border-b-2 border-[#2563EB] pb-4 text-center">
         <h1 className="text-2xl font-bold text-[#0F172A]">{personal.fullName || 'Your Name'}</h1>
-        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#64748B]">
-          {personal.email && <span>{personal.email}</span>}
-          {personal.phone && <span>{personal.phone}</span>}
+        {personal.professionTitle && (
+          <p className="mt-0.5 text-sm text-[#64748B]">{personal.professionTitle}</p>
+        )}
+        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#64748B] justify-center">
+          {personal.email && <span className="text-[#2563EB]">{personal.email}</span>}
+          {personal.phone && <span className="text-[#2563EB]">{personal.phone}</span>}
           {personal.location && <span>{personal.location}</span>}
+          {personal.linkedinUrl && <span className="text-[#2563EB]">{personal.linkedinUrl}</span>}
+          {personal.githubUrl && <span className="text-[#2563EB]">{personal.githubUrl}</span>}
+          {personal.portfolioUrl && <span className="text-[#2563EB]">{personal.portfolioUrl}</span>}
         </div>
       </div>
 
@@ -111,7 +356,10 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0F172A]">{exp.title || 'Job Title'}</h3>
-                  <p className="text-xs text-[#64748B]">{exp.company || 'Company'}</p>
+                  <p className="text-xs text-[#64748B]">
+                    {exp.company || 'Company'}
+                    {(exp.city || exp.state) && ` · ${[exp.city, exp.state].filter(Boolean).join(', ')}`}
+                  </p>
                 </div>
                 <span className="shrink-0 text-xs text-[#94A3B8]">
                   {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
@@ -133,7 +381,10 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0F172A]">{edu.degree || 'Degree'}</h3>
-                  <p className="text-xs text-[#64748B]">{edu.school || 'School'}</p>
+                  <p className="text-xs text-[#64748B]">
+                    {edu.school || 'School'}
+                    {edu.gpa && ` · GPA: ${edu.gpa}`}
+                  </p>
                 </div>
                 <span className="shrink-0 text-xs text-[#94A3B8]">
                   {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
@@ -154,20 +405,76 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
           </div>
         </div>
       )}
+
+      {projects.length > 0 && (
+        <div className="mt-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Projects</h2>
+          {projects.map((proj) => (
+            <div key={proj.id} className="mt-3">
+              <div className="flex items-start justify-between">
+                <h3 className="text-sm font-semibold text-[#0F172A]">{proj.title || 'Project Title'}</h3>
+                {proj.liveLink && <span className="shrink-0 text-xs text-[#2563EB]">{proj.liveLink}</span>}
+              </div>
+              {proj.techStack && (
+                <p className="text-xs text-[#64748B]">{proj.techStack}</p>
+              )}
+              {proj.description && (
+                <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-[#334155]">{proj.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {languages.length > 0 && (
+        <div className="mt-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Languages</h2>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {languages.map((lang) => (
+              <span key={lang.id} className="rounded bg-[#F1F5F9] px-2 py-0.5 text-xs text-[#334155]">
+                {lang.language || 'Language'} · {lang.proficiency}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {certifications.length > 0 && (
+        <div className="mt-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Certifications</h2>
+          {certifications.map((cert) => (
+            <div key={cert.id} className="mt-2 flex items-start justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-[#0F172A]">{cert.name || 'Certification'}</h3>
+                {cert.issuer && <p className="text-xs text-[#64748B]">{cert.issuer}</p>}
+              </div>
+              {cert.date && <span className="shrink-0 text-xs text-[#94A3B8]">{cert.date}</span>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 function CorporateTemplate({ data }: { data: ResumeData }) {
-  const { personal, experience, education, skills } = data
+  const { personal, experience, education, skills, projects, languages, certifications } = data
   return (
     <div className="resume-page flex">
       <div className="w-[260px] shrink-0 bg-[#0F172A] p-[36px] text-white">
-        <h1 className="text-xl font-bold">{personal.fullName || 'Your Name'}</h1>
-        <div className="mt-3 space-y-1 text-xs text-slate-300">
-          {personal.email && <p>{personal.email}</p>}
-          {personal.phone && <p>{personal.phone}</p>}
+        <div className="text-center">
+          <h1 className="text-xl font-bold">{personal.fullName || 'Your Name'}</h1>
+          {personal.professionTitle && (
+            <p className="mt-1 text-xs text-[#2563EB]">{personal.professionTitle}</p>
+          )}
+        </div>
+        <div className="mt-3 space-y-1 text-xs text-slate-300 text-center">
+          {personal.email && <p className="text-[#2563EB]">{personal.email}</p>}
+          {personal.phone && <p className="text-[#2563EB]">{personal.phone}</p>}
           {personal.location && <p>{personal.location}</p>}
+          {personal.linkedinUrl && <p className="text-[#2563EB]">{personal.linkedinUrl}</p>}
+          {personal.githubUrl && <p className="text-[#2563EB]">{personal.githubUrl}</p>}
+          {personal.portfolioUrl && <p className="text-[#2563EB]">{personal.portfolioUrl}</p>}
         </div>
 
         {personal.summary && (
@@ -194,9 +501,40 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
             {education.map((edu) => (
               <div key={edu.id} className="mt-3">
                 <h3 className="text-sm font-semibold">{edu.degree || 'Degree'}</h3>
-                <p className="text-xs text-slate-300">{edu.school || 'School'}</p>
+                <p className="text-xs text-slate-300">
+                  {edu.school || 'School'}
+                  {edu.gpa && ` · GPA: ${edu.gpa}`}
+                </p>
                 <p className="text-xs text-slate-400">
                   {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {languages.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Languages</h2>
+            <div className="mt-2 space-y-1">
+              {languages.map((lang) => (
+                <div key={lang.id} className="flex items-center justify-between text-xs">
+                  <span className="text-slate-200">{lang.language || 'Language'}</span>
+                  <span className="text-slate-400">{lang.proficiency}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {certifications.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Certifications</h2>
+            {certifications.map((cert) => (
+              <div key={cert.id} className="mt-2">
+                <h3 className="text-xs font-semibold">{cert.name || 'Certification'}</h3>
+                <p className="text-xs text-slate-400">
+                  {cert.issuer}{cert.date ? ` · ${cert.date}` : ''}
                 </p>
               </div>
             ))}
@@ -213,7 +551,10 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-[#0F172A]">{exp.title || 'Job Title'}</h3>
-                    <p className="text-xs text-[#64748B]">{exp.company || 'Company'}</p>
+                    <p className="text-xs text-[#64748B]">
+                      {exp.company || 'Company'}
+                      {(exp.city || exp.state) && ` · ${[exp.city, exp.state].filter(Boolean).join(', ')}`}
+                    </p>
                   </div>
                   <span className="shrink-0 text-xs text-[#94A3B8]">
                     {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
@@ -227,7 +568,27 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
           </div>
         )}
 
-        {experience.length === 0 && education.length === 0 && (
+        {projects.length > 0 && (
+          <div className={experience.length > 0 ? 'mt-5' : ''}>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#0F172A]">Projects</h2>
+            {projects.map((proj) => (
+              <div key={proj.id} className="mt-3 border-b border-[#E2E8F0] pb-3 last:border-0">
+                <div className="flex items-start justify-between">
+                  <h3 className="text-sm font-semibold text-[#0F172A]">{proj.title || 'Project Title'}</h3>
+                  {proj.liveLink && <span className="shrink-0 text-xs text-[#2563EB]">{proj.liveLink}</span>}
+                </div>
+                {proj.techStack && (
+                  <p className="text-xs text-[#64748B]">{proj.techStack}</p>
+                )}
+                {proj.description && (
+                  <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-[#334155]">{proj.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {experience.length === 0 && projects.length === 0 && education.length === 0 && (
           <div className="flex h-full items-center justify-center text-sm text-[#94A3B8]">
             Add your experience to see it here
           </div>
@@ -238,15 +599,21 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
 }
 
 function ModernTemplate({ data }: { data: ResumeData }) {
-  const { personal, experience, education, skills } = data
+  const { personal, experience, education, skills, projects, languages, certifications } = data
   return (
     <div className="resume-page">
-      <div className="bg-[#0F172A] px-[48px] py-[36px]">
+      <div className="bg-[#0F172A] px-[48px] py-[36px] text-center">
         <h1 className="text-2xl font-bold text-white">{personal.fullName || 'Your Name'}</h1>
-        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-300">
-          {personal.email && <span>{personal.email}</span>}
-          {personal.phone && <span>{personal.phone}</span>}
+        {personal.professionTitle && (
+          <p className="mt-0.5 text-sm text-[#2563EB]">{personal.professionTitle}</p>
+        )}
+        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center">
+          {personal.email && <span className="text-[#2563EB]">{personal.email}</span>}
+          {personal.phone && <span className="text-[#2563EB]">{personal.phone}</span>}
           {personal.location && <span>{personal.location}</span>}
+          {personal.linkedinUrl && <span className="text-[#2563EB]">{personal.linkedinUrl}</span>}
+          {personal.githubUrl && <span className="text-[#2563EB]">{personal.githubUrl}</span>}
+          {personal.portfolioUrl && <span className="text-[#2563EB]">{personal.portfolioUrl}</span>}
         </div>
         {personal.summary && (
           <p className="mt-3 text-xs leading-relaxed text-slate-300">{personal.summary}</p>
@@ -264,7 +631,10 @@ function ModernTemplate({ data }: { data: ResumeData }) {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-[#0F172A]">{exp.title || 'Job Title'}</h3>
-                    <p className="text-xs text-[#64748B]">{exp.company || 'Company'}</p>
+                    <p className="text-xs text-[#64748B]">
+                      {exp.company || 'Company'}
+                      {(exp.city || exp.state) && ` · ${[exp.city, exp.state].filter(Boolean).join(', ')}`}
+                    </p>
                   </div>
                   <span className="shrink-0 text-xs text-[#94A3B8]">
                     {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
@@ -288,7 +658,10 @@ function ModernTemplate({ data }: { data: ResumeData }) {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-[#0F172A]">{edu.degree || 'Degree'}</h3>
-                    <p className="text-xs text-[#64748B]">{edu.school || 'School'}</p>
+                    <p className="text-xs text-[#64748B]">
+                      {edu.school || 'School'}
+                      {edu.gpa && ` · GPA: ${edu.gpa}`}
+                    </p>
                   </div>
                   <span className="shrink-0 text-xs text-[#94A3B8]">
                     {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
@@ -309,6 +682,60 @@ function ModernTemplate({ data }: { data: ResumeData }) {
                 <span key={i} className="rounded bg-[#2563EB]/10 px-3 py-1 text-xs font-medium text-[#2563EB]">{skill}</span>
               ))}
             </div>
+          </div>
+        )}
+
+        {projects.length > 0 && (
+          <div>
+            <h2 className="border-b-2 border-[#2563EB] pb-1 text-sm font-bold uppercase tracking-widest text-[#2563EB]">
+              Projects
+            </h2>
+            {projects.map((proj) => (
+              <div key={proj.id} className="mt-4">
+                <div className="flex items-start justify-between">
+                  <h3 className="text-sm font-semibold text-[#0F172A]">{proj.title || 'Project Title'}</h3>
+                  {proj.liveLink && <span className="shrink-0 text-xs text-[#2563EB]">{proj.liveLink}</span>}
+                </div>
+                {proj.techStack && (
+                  <p className="text-xs text-[#64748B]">{proj.techStack}</p>
+                )}
+                {proj.description && (
+                  <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-[#334155]">{proj.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {languages.length > 0 && (
+          <div>
+            <h2 className="border-b-2 border-[#2563EB] pb-1 text-sm font-bold uppercase tracking-widest text-[#2563EB]">
+              Languages
+            </h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {languages.map((lang) => (
+                <span key={lang.id} className="rounded bg-[#2563EB]/10 px-3 py-1 text-xs font-medium text-[#2563EB]">
+                  {lang.language || 'Language'} · {lang.proficiency}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {certifications.length > 0 && (
+          <div>
+            <h2 className="border-b-2 border-[#2563EB] pb-1 text-sm font-bold uppercase tracking-widest text-[#2563EB]">
+              Certifications
+            </h2>
+            {certifications.map((cert) => (
+              <div key={cert.id} className="mt-3 flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-[#0F172A]">{cert.name || 'Certification'}</h3>
+                  {cert.issuer && <p className="text-xs text-[#64748B]">{cert.issuer}</p>}
+                </div>
+                {cert.date && <span className="shrink-0 text-xs text-[#94A3B8]">{cert.date}</span>}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -343,8 +770,8 @@ function ResumePreview({ data }: { data: ResumeData }) {
     <div ref={containerRef} className="overflow-hidden">
       <div
         ref={pageRef}
-        className="origin-top-left shadow-lg print-only"
-        style={{ transform: `scale(${scale})`, width: 794, minHeight: 1123 }}
+        className="origin-top-left shadow-lg"
+        style={{ transform: `scale(${scale})`, width: 794, maxHeight: 1120 }}
       >
         <Template data={data} />
       </div>
@@ -352,7 +779,21 @@ function ResumePreview({ data }: { data: ResumeData }) {
   )
 }
 
+function PrintableResume({ data }: { data: ResumeData }) {
+  const Template = data.template === 'corporate' ? CorporateTemplate
+    : data.template === 'modern' ? ModernTemplate
+    : MinimalTemplate
+
+  return (
+    <div className="print-only">
+      <Template data={data} />
+    </div>
+  )
+}
+
 // ─── Form Steps ──────────────────────────────────────────────
+
+const INPUT_CLASS = 'mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent'
 
 function PersonalForm({ data, onChange }: { data: ResumeData; onChange: (d: ResumeData) => void }) {
   const update = (field: keyof ResumeData['personal'], value: string) =>
@@ -363,43 +804,41 @@ function PersonalForm({ data, onChange }: { data: ResumeData; onChange: (d: Resu
       <div>
         <label className="block text-sm font-medium text-primary">Full Name</label>
         <input
-          type="text"
-          value={data.personal.fullName}
+          type="text" value={data.personal.fullName}
           onChange={(e) => update('fullName', e.target.value)}
-          placeholder="John Smith"
-          className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          placeholder="John Smith" className={INPUT_CLASS}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium text-primary">Email</label>
-          <input
-            type="email"
-            value={data.personal.email}
-            onChange={(e) => update('email', e.target.value)}
-            placeholder="john@example.com"
-            className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-primary">Phone</label>
-          <input
-            type="tel"
-            value={data.personal.phone}
-            onChange={(e) => update('phone', e.target.value)}
-            placeholder="(555) 123-4567"
-            className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-primary">Profession Title</label>
+        <input
+          type="text" value={data.personal.professionTitle}
+          onChange={(e) => update('professionTitle', e.target.value)}
+          placeholder="Software Engineer" className={INPUT_CLASS}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-primary">Email</label>
+        <input
+          type="email" value={data.personal.email}
+          onChange={(e) => update('email', e.target.value)}
+          placeholder="john@example.com" className={INPUT_CLASS}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-primary">Phone</label>
+        <input
+          type="tel" value={data.personal.phone}
+          onChange={(e) => update('phone', e.target.value)}
+          placeholder="(555) 123-4567" className={INPUT_CLASS}
+        />
       </div>
       <div>
         <label className="block text-sm font-medium text-primary">Location</label>
         <input
-          type="text"
-          value={data.personal.location}
+          type="text" value={data.personal.location}
           onChange={(e) => update('location', e.target.value)}
-          placeholder="New York, NY"
-          className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          placeholder="New York, NY" className={INPUT_CLASS}
         />
       </div>
       <div>
@@ -408,8 +847,32 @@ function PersonalForm({ data, onChange }: { data: ResumeData; onChange: (d: Resu
           value={data.personal.summary}
           onChange={(e) => update('summary', e.target.value)}
           placeholder="Experienced professional with a proven track record..."
-          rows={4}
-          className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+          rows={6}
+          className={`${INPUT_CLASS} resize-none`}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-primary">LinkedIn URL</label>
+        <input
+          type="url" value={data.personal.linkedinUrl}
+          onChange={(e) => update('linkedinUrl', e.target.value)}
+          placeholder="linkedin.com/in/johnsmith" className={INPUT_CLASS}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-primary">GitHub URL</label>
+        <input
+          type="url" value={data.personal.githubUrl}
+          onChange={(e) => update('githubUrl', e.target.value)}
+          placeholder="github.com/johnsmith" className={INPUT_CLASS}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-primary">Portfolio URL</label>
+        <input
+          type="url" value={data.personal.portfolioUrl}
+          onChange={(e) => update('portfolioUrl', e.target.value)}
+          placeholder="yourportfolio.com" className={INPUT_CLASS}
         />
       </div>
     </div>
@@ -420,7 +883,7 @@ function ExperienceForm({ data, onChange }: { data: ResumeData; onChange: (d: Re
   const addItem = () =>
     onChange({
       ...data,
-      experience: [...data.experience, { id: generateId(), company: '', title: '', startDate: '', endDate: '', description: '' }],
+      experience: [...data.experience, { id: generateId(), company: '', city: '', state: '', title: '', startDate: '', endDate: '', description: '' }],
     })
 
   const updateItem = (id: string, field: keyof ExperienceItem, value: string) =>
@@ -444,55 +907,50 @@ function ExperienceForm({ data, onChange }: { data: ResumeData; onChange: (d: Re
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="block text-xs font-medium text-primary">Job Title</label>
-                <input
-                  type="text" value={exp.title} onChange={(e) => updateItem(exp.id, 'title', e.target.value)}
-                  placeholder="Software Engineer"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={exp.title} onChange={(e) => updateItem(exp.id, 'title', e.target.value)}
+                  placeholder="Software Engineer" className={INPUT_CLASS} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-primary">Company</label>
-                <input
-                  type="text" value={exp.company} onChange={(e) => updateItem(exp.id, 'company', e.target.value)}
-                  placeholder="Acme Corp"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={exp.company} onChange={(e) => updateItem(exp.id, 'company', e.target.value)}
+                  placeholder="Acme Corp" className={INPUT_CLASS} />
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium text-primary">City</label>
+                <input type="text" value={exp.city} onChange={(e) => updateItem(exp.id, 'city', e.target.value)}
+                  placeholder="San Francisco" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-primary">State</label>
+                <input type="text" value={exp.state} onChange={(e) => updateItem(exp.id, 'state', e.target.value)}
+                  placeholder="CA" className={INPUT_CLASS} />
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="block text-xs font-medium text-primary">Start Date</label>
-                <input
-                  type="text" value={exp.startDate} onChange={(e) => updateItem(exp.id, 'startDate', e.target.value)}
-                  placeholder="Jan 2020"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={exp.startDate} onChange={(e) => updateItem(exp.id, 'startDate', e.target.value)}
+                  placeholder="Jan 2020" className={INPUT_CLASS} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-primary">End Date</label>
-                <input
-                  type="text" value={exp.endDate} onChange={(e) => updateItem(exp.id, 'endDate', e.target.value)}
-                  placeholder="Present"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={exp.endDate} onChange={(e) => updateItem(exp.id, 'endDate', e.target.value)}
+                  placeholder="Present" className={INPUT_CLASS} />
               </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-primary">Description</label>
-              <textarea
-                value={exp.description} onChange={(e) => updateItem(exp.id, 'description', e.target.value)}
-                placeholder="• Led a team of 5 engineers to deliver key features on time..."
-                rows={3}
-                className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none"
-              />
+              <textarea value={exp.description} onChange={(e) => updateItem(exp.id, 'description', e.target.value)}
+                placeholder="• Led a team of 5 engineers to deliver key features on time..." rows={3}
+                className={`${INPUT_CLASS} resize-none`} />
             </div>
           </div>
         </div>
       ))}
-      <button
-        onClick={addItem}
-        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent"
-      >
+      <button onClick={addItem}
+        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent">
         + Add Experience
       </button>
     </div>
@@ -503,7 +961,7 @@ function EducationForm({ data, onChange }: { data: ResumeData; onChange: (d: Res
   const addItem = () =>
     onChange({
       ...data,
-      education: [...data.education, { id: generateId(), school: '', degree: '', startDate: '', endDate: '' }],
+      education: [...data.education, { id: generateId(), school: '', degree: '', startDate: '', endDate: '', gpa: '' }],
     })
 
   const updateItem = (id: string, field: keyof EducationItem, value: string) =>
@@ -527,46 +985,37 @@ function EducationForm({ data, onChange }: { data: ResumeData; onChange: (d: Res
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="block text-xs font-medium text-primary">Degree</label>
-                <input
-                  type="text" value={edu.degree} onChange={(e) => updateItem(edu.id, 'degree', e.target.value)}
-                  placeholder="Bachelor of Science"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={edu.degree} onChange={(e) => updateItem(edu.id, 'degree', e.target.value)}
+                  placeholder="Bachelor of Science" className={INPUT_CLASS} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-primary">School</label>
-                <input
-                  type="text" value={edu.school} onChange={(e) => updateItem(edu.id, 'school', e.target.value)}
-                  placeholder="MIT"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={edu.school} onChange={(e) => updateItem(edu.id, 'school', e.target.value)}
+                  placeholder="MIT" className={INPUT_CLASS} />
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="block text-xs font-medium text-primary">Start Date</label>
-                <input
-                  type="text" value={edu.startDate} onChange={(e) => updateItem(edu.id, 'startDate', e.target.value)}
-                  placeholder="Sep 2016"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={edu.startDate} onChange={(e) => updateItem(edu.id, 'startDate', e.target.value)}
+                  placeholder="Sep 2016" className={INPUT_CLASS} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-primary">End Date</label>
-                <input
-                  type="text" value={edu.endDate} onChange={(e) => updateItem(edu.id, 'endDate', e.target.value)}
-                  placeholder="May 2020"
-                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                />
+                <input type="text" value={edu.endDate} onChange={(e) => updateItem(edu.id, 'endDate', e.target.value)}
+                  placeholder="May 2020" className={INPUT_CLASS} />
               </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-primary">GPA (optional)</label>
+              <input type="text" value={edu.gpa} onChange={(e) => updateItem(edu.id, 'gpa', e.target.value)}
+                placeholder="3.8 / 4.0" className={INPUT_CLASS} />
             </div>
           </div>
         </div>
       ))}
-      <button
-        onClick={addItem}
-        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent"
-      >
+      <button onClick={addItem}
+        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent">
         + Add Education
       </button>
     </div>
@@ -591,27 +1040,21 @@ function SkillsForm({ data, onChange }: { data: ResumeData; onChange: (d: Resume
     <div className="space-y-4">
       <div className="flex gap-2">
         <input
-          type="text"
-          value={input}
+          type="text" value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
           placeholder="e.g. JavaScript, Project Management, Excel"
-          className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className={`flex-1 ${INPUT_CLASS}`}
         />
-        <button
-          onClick={addSkill}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
-        >
+        <button onClick={addSkill}
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90">
           Add
         </button>
       </div>
       {data.skills.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {data.skills.map((skill) => (
-            <span
-              key={skill}
-              className="inline-flex items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-sm text-primary border border-border"
-            >
+            <span key={skill} className="inline-flex items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-sm text-primary border border-border">
               {skill}
               <button onClick={() => removeSkill(skill)} className="ml-1 text-slate-400 hover:text-red-500">&times;</button>
             </span>
@@ -625,24 +1068,196 @@ function SkillsForm({ data, onChange }: { data: ResumeData; onChange: (d: Resume
   )
 }
 
+function ProjectsForm({ data, onChange }: { data: ResumeData; onChange: (d: ResumeData) => void }) {
+  const addItem = () =>
+    onChange({
+      ...data,
+      projects: [...data.projects, { id: generateId(), title: '', techStack: '', description: '', liveLink: '' }],
+    })
+
+  const updateItem = (id: string, field: keyof ProjectItem, value: string) =>
+    onChange({
+      ...data,
+      projects: data.projects.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
+    })
+
+  const removeItem = (id: string) =>
+    onChange({ ...data, projects: data.projects.filter((p) => p.id !== id) })
+
+  return (
+    <div className="space-y-4">
+      {data.projects.map((proj, idx) => (
+        <div key={proj.id} className="rounded-lg border border-border bg-white p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-primary">Project {idx + 1}</h3>
+            <button onClick={() => removeItem(proj.id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+          </div>
+          <div className="mt-3 space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-primary">Project Title</label>
+              <input type="text" value={proj.title} onChange={(e) => updateItem(proj.id, 'title', e.target.value)}
+                placeholder="E-Commerce Platform" className={INPUT_CLASS} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-primary">Tech Stack</label>
+              <input type="text" value={proj.techStack} onChange={(e) => updateItem(proj.id, 'techStack', e.target.value)}
+                placeholder="React, Node.js, PostgreSQL" className={INPUT_CLASS} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-primary">Description</label>
+              <textarea value={proj.description} onChange={(e) => updateItem(proj.id, 'description', e.target.value)}
+                placeholder="• Built a full-stack e-commerce platform with payment integration..." rows={3}
+                className={`${INPUT_CLASS} resize-none`} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-primary">Live Link</label>
+              <input type="url" value={proj.liveLink} onChange={(e) => updateItem(proj.id, 'liveLink', e.target.value)}
+                placeholder="https://myproject.com" className={INPUT_CLASS} />
+            </div>
+          </div>
+        </div>
+      ))}
+      <button onClick={addItem}
+        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent">
+        + Add Project
+      </button>
+    </div>
+  )
+}
+
+function LanguagesForm({ data, onChange }: { data: ResumeData; onChange: (d: ResumeData) => void }) {
+  const addItem = () =>
+    onChange({
+      ...data,
+      languages: [...data.languages, { id: generateId(), language: '', proficiency: 'Intermediate' as const }],
+    })
+
+  const updateItem = (id: string, field: keyof LanguageItem, value: string) =>
+    onChange({
+      ...data,
+      languages: data.languages.map((l) => (l.id === id ? { ...l, [field]: value } : l)),
+    })
+
+  const removeItem = (id: string) =>
+    onChange({ ...data, languages: data.languages.filter((l) => l.id !== id) })
+
+  return (
+    <div className="space-y-4">
+      {data.languages.map((lang, idx) => (
+        <div key={lang.id} className="rounded-lg border border-border bg-white p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-primary">Language {idx + 1}</h3>
+            <button onClick={() => removeItem(lang.id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+          </div>
+          <div className="mt-3 space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium text-primary">Language</label>
+                <input type="text" value={lang.language} onChange={(e) => updateItem(lang.id, 'language', e.target.value)}
+                  placeholder="English" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-primary">Proficiency</label>
+                <select
+                  value={lang.proficiency}
+                  onChange={(e) => updateItem(lang.id, 'proficiency', e.target.value)}
+                  className={INPUT_CLASS}
+                >
+                  <option value="Native">Native</option>
+                  <option value="Fluent">Fluent</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Basic">Basic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <button onClick={addItem}
+        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent">
+        + Add Language
+      </button>
+    </div>
+  )
+}
+
+function CertificationsForm({ data, onChange }: { data: ResumeData; onChange: (d: ResumeData) => void }) {
+  const addItem = () =>
+    onChange({
+      ...data,
+      certifications: [...data.certifications, { id: generateId(), name: '', issuer: '', date: '' }],
+    })
+
+  const updateItem = (id: string, field: keyof CertificationItem, value: string) =>
+    onChange({
+      ...data,
+      certifications: data.certifications.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
+    })
+
+  const removeItem = (id: string) =>
+    onChange({ ...data, certifications: data.certifications.filter((c) => c.id !== id) })
+
+  return (
+    <div className="space-y-4">
+      {data.certifications.map((cert, idx) => (
+        <div key={cert.id} className="rounded-lg border border-border bg-white p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-primary">Certification {idx + 1}</h3>
+            <button onClick={() => removeItem(cert.id)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+          </div>
+          <div className="mt-3 space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-primary">Certification Name</label>
+              <input type="text" value={cert.name} onChange={(e) => updateItem(cert.id, 'name', e.target.value)}
+                placeholder="AWS Certified Solutions Architect" className={INPUT_CLASS} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium text-primary">Issuing Organization</label>
+                <input type="text" value={cert.issuer} onChange={(e) => updateItem(cert.id, 'issuer', e.target.value)}
+                  placeholder="Amazon Web Services" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-primary">Date</label>
+                <input type="text" value={cert.date} onChange={(e) => updateItem(cert.id, 'date', e.target.value)}
+                  placeholder="Mar 2023" className={INPUT_CLASS} />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <button onClick={addItem}
+        className="w-full rounded-lg border-2 border-dashed border-border py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent">
+        + Add Certification
+      </button>
+    </div>
+  )
+}
+
 // ─── Main Builder ────────────────────────────────────────────
 
 export default function BuilderClient() {
   const [data, setData] = useState<ResumeData>(defaultResumeData)
-  const [step, setStep] = useState<FormStep>('personal')
+  const [step, setStep] = useState<FormStep>('template')
   const [showModal, setShowModal] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) setData(JSON.parse(saved))
+      if (saved) {
+        const migrated = migrateResumeData(JSON.parse(saved))
+        setData(migrated)
+        setStep('personal')
+      }
     } catch {}
     const params = new URLSearchParams(window.location.search)
     const t = params.get('template')
     if (t === 'minimal' || t === 'corporate' || t === 'modern') {
       setData((d) => ({ ...d, template: t }))
+      setStep('personal')
     }
     setMounted(true)
   }, [])
@@ -656,7 +1271,12 @@ export default function BuilderClient() {
     setTimeout(() => window.print(), 100)
   }, [])
 
-  const stepIndex = STEPS.findIndex((s) => s.key === step)
+  const handleReset = useCallback(() => {
+    setData(defaultResumeData)
+    setStep('template')
+    setShowResetModal(false)
+    localStorage.removeItem(STORAGE_KEY)
+  }, [])
 
   if (!mounted) {
     return (
@@ -666,95 +1286,124 @@ export default function BuilderClient() {
     )
   }
 
+  if (step === 'template') {
+    return (
+      <>
+        <div className="no-print min-h-[calc(100vh-52px)]">
+          <TemplateSelectionScreen
+            data={data}
+            onChange={setData}
+            onContinue={() => setStep('personal')}
+          />
+        </div>
+        {/* Print-only resume: rendered outside no-print so it's visible during print */}
+        <div className="hidden print:block">
+          <PrintableResume data={data} />
+        </div>
+      </>
+    )
+  }
+
+  const currentSectionIndex = SECTION_NAV.findIndex(s => s.key === step)
+  const canGoPrevious = currentSectionIndex > 0
+  const canGoNext = currentSectionIndex < SECTION_NAV.length - 1
+
   return (
     <>
-      <div className="no-print flex min-h-[calc(100vh-65px)] flex-col lg:flex-row">
+      <div className="no-print flex min-h-[calc(100vh-52px)] flex-col md:flex-row">
         {/* Form Panel */}
-        <div className="w-full border-r border-border bg-background p-3 sm:p-6 lg:w-[480px] lg:overflow-y-auto">
-          {/* Step Indicator */}
-          <div className="mb-4 flex items-center gap-1 sm:mb-6">
-            {STEPS.map((s, i) => (
-              <button
-                key={s.key}
-                onClick={() => setStep(s.key)}
-                className={`flex-1 rounded-lg py-2.5 text-center text-xs font-medium transition-colors ${
-                  step === s.key ? 'bg-accent text-white' : 'bg-white text-foreground border border-border hover:border-accent'
-                }`}
-              >
-                <span className="sm:hidden">{i + 1}. </span>{s.label}
-              </button>
-            ))}
+        <div className="flex w-full flex-col border-r border-border bg-background lg:w-[520px] md:max-w-2/5">
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <h2 className="mb-4 text-lg font-bold text-primary">
+              {SECTION_NAV.find((s) => s.key === step)?.label}
+            </h2>
+            {step === 'personal' && <PersonalForm data={data} onChange={setData} />}
+            {step === 'experience' && <ExperienceForm data={data} onChange={setData} />}
+            {step === 'education' && <EducationForm data={data} onChange={setData} />}
+            {step === 'skills' && <SkillsForm data={data} onChange={setData} />}
+            {step === 'projects' && <ProjectsForm data={data} onChange={setData} />}
+            {step === 'languages' && <LanguagesForm data={data} onChange={setData} />}
+            {step === 'certifications' && <CertificationsForm data={data} onChange={setData} />}
           </div>
 
-          {/* Template Selector */}
-          <div className="mb-4 sm:mb-6">
-            <label className="block text-sm font-medium text-primary">Template</label>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {(['minimal', 'corporate', 'modern'] as const).map((t) => (
+          {/* Footer Action Bar */}
+          <div className="shrink-0 border-t border-border bg-surface p-3 sm:p-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2 justify-between">
                 <button
-                  key={t}
-                  onClick={() => setData({ ...data, template: t })}
-                  className={`rounded-lg border py-2.5 text-center text-xs font-medium capitalize transition-colors ${
-                    data.template === t ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-white text-foreground hover:border-accent'
-                  }`}
+                  onClick={() => setStep(SECTION_NAV[currentSectionIndex - 1].key)}
+                  disabled={!canGoPrevious}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {t}
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  Previous
                 </button>
-              ))}
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  Download PDF
+                </button>
+                <button
+                  onClick={() => setStep(SECTION_NAV[currentSectionIndex + 1].key)}
+                  disabled={!canGoNext}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setShowResetModal(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-400 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.992 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                  </svg>
+                  Reset Data
+                </button>
+                <button
+                  onClick={() => setStep('template')}
+                  className="rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition-colors hover:text-accent hover:border-accent"
+                >
+                  Change Template
+                </button>
+                {/* Mobile preview toggle */}
+                <button
+                  onClick={() => setShowPreview(!showPreview)}
+                  className="rounded-lg border border-accent bg-accent/5 px-3 py-2 text-sm font-medium text-accent lg:hidden"
+                >
+                  {showPreview ? 'Hide Preview' : 'Preview'}
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Form */}
-          {step === 'personal' && <PersonalForm data={data} onChange={setData} />}
-          {step === 'experience' && <ExperienceForm data={data} onChange={setData} />}
-          {step === 'education' && <EducationForm data={data} onChange={setData} />}
-          {step === 'skills' && <SkillsForm data={data} onChange={setData} />}
-
-          {/* Navigation */}
-          <div className="mt-4 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <button
-              onClick={() => setStep(STEPS[stepIndex - 1]?.key ?? step)}
-              disabled={stepIndex === 0}
-              className="order-2 rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed sm:order-1"
-            >
-              Previous
-            </button>
-
-            {stepIndex < STEPS.length - 1 ? (
-              <button
-                onClick={() => setStep(STEPS[stepIndex + 1].key)}
-                className="order-1 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent/90 sm:order-2"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowModal(true)}
-                className="order-1 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent/90 sm:order-2"
-              >
-                Download PDF
-              </button>
-            )}
-          </div>
-
-          {/* Mobile preview toggle */}
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className="mt-3 w-full rounded-lg border border-accent bg-accent/5 py-2.5 text-sm font-medium text-accent lg:hidden"
-          >
-            {showPreview ? 'Hide Preview' : 'Show Preview'}
-          </button>
         </div>
 
         {/* Preview Panel */}
-        <div className={`flex-1 overflow-y-auto bg-slate-200 p-4 sm:p-6 ${showPreview ? '' : 'hidden lg:block'}`}>
-          <div className="mx-auto max-w-[794px]">
+        <div className={`flex-1 overflow-hidden bg-slate-200 p-2 preview-container ${showPreview ? 'flex flex-col' : 'hidden md:flex md:flex-col'}`}>
+          <div className="mx-auto w-full max-w-[794px] flex-1 overflow-y-auto">
             <ResumePreview data={data} />
           </div>
         </div>
       </div>
 
+      {/* Print-only resume: rendered outside no-print so it's visible during print */}
+      <div className="hidden print:block">
+        <PrintableResume data={data} />
+      </div>
+
       {showModal && <DownloadModal onClose={() => setShowModal(false)} onDownload={handleDownload} />}
+      {showResetModal && <ConfirmResetModal onClose={() => setShowResetModal(false)} onConfirm={handleReset} />}
     </>
   )
 }
