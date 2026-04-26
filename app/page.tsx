@@ -5,7 +5,7 @@ const features = [
     title: 'Completely Free',
     description: 'No hidden fees, no premium tiers. Build and download your resume at zero cost. Always free, forever.',
     icon: (
-      <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-label="Checkmark icon">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>
     ),
@@ -14,7 +14,7 @@ const features = [
     title: 'No Signup Required',
     description: 'Start building immediately. Your data stays in your browser — private and secure. No login, no account creation.',
     icon: (
-      <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-label="Lock icon">
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
       </svg>
     ),
@@ -23,7 +23,7 @@ const features = [
     title: 'ATS-Friendly Templates',
     description: 'Clean, structured layouts that pass Applicant Tracking Systems with ease. Designed for recruiters and employers.',
     icon: (
-      <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-label="Document icon">
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
       </svg>
     ),
@@ -58,7 +58,7 @@ export default function Home() {
             </Link>
             <Link
               href="/templates"
-              className="inline-flex h-12 items-center justify-center rounded-lg border border-border bg-surface px-8 text-base font-semibold text-primary transition-colors hover:bg-background"
+              className="inline-flex h-12 items-center justify-center rounded-lg border border-black bg-surface px-8 text-base font-semibold text-primary transition-colors hover:bg-background"
             >
               View Templates
             </Link>

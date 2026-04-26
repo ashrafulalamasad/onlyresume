@@ -142,6 +142,42 @@ export default function RootLayout({
           }}
         />
         <Script
+          id="json-ld-breadcrumb"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: 'Home',
+                  item: 'https://onlyresume.vercel.app',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: 'Builder',
+                  item: 'https://onlyresume.vercel.app/builder',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: 'Templates',
+                  item: 'https://onlyresume.vercel.app/templates',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 4,
+                  name: 'Guide',
+                  item: 'https://onlyresume.vercel.app/guide',
+                },
+              ],
+            }),
+          }}
+        />
+        <Script
           id="json-ld-org"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -163,7 +199,7 @@ export default function RootLayout({
         {/* Adsterra Social Bar placeholder */}
         <div id="adsterra-social-bar" />
 
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-15">{children}</main>
         <Footer />
       </body>
     </html>

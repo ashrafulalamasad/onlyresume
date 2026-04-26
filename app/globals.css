@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
 :root {
   --background: #F1F5F9;
   --foreground: #334155;
@@ -27,22 +32,66 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
+/* A4 Page Container - Standard dimensions */
+.resume-page {
+  /* A4 dimensions at 96 DPI: 794px × 1123px */
+  width: 794px;
+  min-height: 1123px;
+  background: white;
+  color: #334155;
+
+  /* 0.5" margins = 48px at 96 DPI */
+  padding: 48px;
+
+  /* Box sizing to include padding in width/height */
+  box-sizing: border-box;
+
+  /* Remove any visual glitches */
+  margin: 0 auto;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Print Media - Optimized for PDF */
 @media print {
   @page {
     size: A4;
     margin: 0;
   }
 
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    background: white !important;
+  }
+
   body {
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: hidden !important;
   }
 
+  /* Hide scrollbars completely */
+  ::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Hide UI elements not part of resume */
   .no-print {
     display: none !important;
   }
@@ -58,31 +107,55 @@ body {
   }
 
   .hidden {
-    display: none;
+    display: none !important;
   }
 
   .print\:block {
     display: block !important;
   }
 
+  /* Resume page in print mode */
   .resume-page {
-    width: 100%;
-    height: auto;
-    padding: 0;
-    margin: 0;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+
+    /* 0.5" margins maintained for PDF */
+    padding: 48px !important;
+
+    margin: 0 !important;
+    border: none !important;
+    outline: none !important;
     box-shadow: none !important;
-    transform: none !important;
+
     page-break-after: always;
     page-break-inside: avoid;
+    overflow: visible !important;
   }
-}
 
-.resume-page {
-  width: 794px;
-  min-height: 1123px;
-  background: white;
-  color: #334155;
-  overflow: hidden;
+  /* Force all content to be visible without overflow */
+  * {
+    overflow: visible !important;
+  }
+
+  /* Hide non-content UI elements */
+  [class*="preview"],
+  [class*="container"],
+  [class*="dialog"],
+  [class*="modal"],
+  [class*="sidebar"],
+  [class*="nav"],
+  [class*="menu"],
+  [class*="button"] {
+    display: none !important;
+  }
+
+  /* Keep resume content visible */
+  .resume-page * {
+    display: block !important;
+    visibility: visible !important;
+  }
 }
 
 @keyframes scan-pulse {

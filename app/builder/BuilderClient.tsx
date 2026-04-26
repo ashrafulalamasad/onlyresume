@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { ResumeData, FormStep, ExperienceItem, EducationItem, ProjectItem, LanguageItem, CertificationItem } from './types'
 import { defaultResumeData } from './types'
+import { validateEmail, validateUrl, validatePhone, sanitizeInput } from './validation'
+import { generateResumePdf, downloadPdf } from './pdfGenerator'
 
 const STORAGE_KEY = 'onlyresume-data'
 
@@ -99,7 +101,7 @@ function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownloa
   const [phase, setPhase] = useState<'scanning' | 'ready'>('scanning')
 
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('ready'), 2000)
+    const timer = setTimeout(() => setPhase('ready'), 1500)
     return () => clearTimeout(timer)
   }, [])
 
@@ -117,9 +119,9 @@ function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownloa
               </svg>
             </div>
             <h3 className="text-xl font-bold text-primary">Generating PDF...</h3>
-            <p className="mt-2 text-sm text-foreground">Checking formatting and structure</p>
+            <p className="mt-2 text-sm text-foreground">Formatting your resume</p>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full w-full origin-left rounded-full bg-accent" style={{ animation: 'scan-bar 2s ease-in-out forwards' }} />
+              <div className="h-full w-full origin-left rounded-full bg-accent" style={{ animation: 'scan-bar 1.5s ease-in-out forwards' }} />
             </div>
           </>
         ) : (
@@ -129,8 +131,8 @@ function DownloadModal({ onClose, onDownload }: { onClose: () => void; onDownloa
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-primary">Your PDF is Ready!</h3>
-            <p className="mt-2 text-sm text-foreground">Your resume looks great. No issues found.</p>
+            <h3 className="text-xl font-bold text-primary">Ready to Download!</h3>
+            <p className="mt-2 text-sm text-foreground">Your resume is formatted and ready</p>
             <button
               onClick={onDownload}
               className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-green-600 text-base font-semibold text-white transition-colors hover:bg-green-700"
@@ -350,19 +352,23 @@ function TemplateSelectionScreen({ data, onChange, onContinue }: {
 function MinimalTemplate({ data }: { data: ResumeData }) {
   const { personal, experience, education, skills, projects, languages, certifications } = data
   return (
-    <div className="resume-page p-[48px]">
+    <div className="resume-page">
       <div className="border-b-2 border-[#2563EB] pb-4 text-center">
         <h1 className="text-2xl font-bold text-[#0F172A]">{personal.fullName || 'Your Name'}</h1>
         {personal.professionTitle && (
           <p className="mt-0.5 text-sm text-[#64748B]">{personal.professionTitle}</p>
         )}
-        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#64748B] justify-center">
-          {personal.email && <span className="text-[#2563EB]">{personal.email}</span>}
-          {personal.phone && <span className="text-[#2563EB]">{personal.phone}</span>}
-          {personal.location && <span>{personal.location}</span>}
-          {personal.linkedinUrl && <span className="text-[#2563EB]">{personal.linkedinUrl}</span>}
-          {personal.githubUrl && <span className="text-[#2563EB]">{personal.githubUrl}</span>}
-          {personal.portfolioUrl && <span className="text-[#2563EB]">{personal.portfolioUrl}</span>}
+        <div className="mt-1 flex flex-col items-center gap-0.5 text-xs text-[#64748B]">
+          <div className="flex gap-x-4 gap-y-0.5 text-xs text-[#64748B] justify-center flex-nowrap">
+            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB] hover:underline">{personal.email}</a>}
+            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB] hover:underline">{personal.phone}</a>}
+            {personal.location && <span>{personal.location}</span>}
+          </div>
+          <div className="flex gap-x-4 gap-y-0.5 text-xs text-[#64748B] justify-center flex-nowrap">
+            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.linkedinUrl}</a>}
+            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.githubUrl}</a>}
+            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.portfolioUrl}</a>}
+          </div>
         </div>
       </div>
 
@@ -494,12 +500,16 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
           )}
         </div>
         <div className="mt-3 space-y-1 text-xs text-slate-300 text-center">
-          {personal.email && <p className="text-[#2563EB]">{personal.email}</p>}
-          {personal.phone && <p className="text-[#2563EB]">{personal.phone}</p>}
-          {personal.location && <p>{personal.location}</p>}
-          {personal.linkedinUrl && <p className="text-[#2563EB]">{personal.linkedinUrl}</p>}
-          {personal.githubUrl && <p className="text-[#2563EB]">{personal.githubUrl}</p>}
-          {personal.portfolioUrl && <p className="text-[#2563EB]">{personal.portfolioUrl}</p>}
+          <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
+            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB] hover:underline">{personal.email}</a>}
+            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB] hover:underline">{personal.phone}</a>}
+            {personal.location && <p>{personal.location}</p>}
+          </div>
+          <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
+            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.linkedinUrl}</a>}
+            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.githubUrl}</a>}
+            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.portfolioUrl}</a>}
+          </div>
         </div>
 
         {personal.summary && (
@@ -632,16 +642,20 @@ function ModernTemplate({ data }: { data: ResumeData }) {
         {personal.professionTitle && (
           <p className="mt-0.5 text-sm text-[#2563EB]">{personal.professionTitle}</p>
         )}
-        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center">
-          {personal.email && <span className="text-[#2563EB]">{personal.email}</span>}
-          {personal.phone && <span className="text-[#2563EB]">{personal.phone}</span>}
-          {personal.location && <span>{personal.location}</span>}
-          {personal.linkedinUrl && <span className="text-[#2563EB]">{personal.linkedinUrl}</span>}
-          {personal.githubUrl && <span className="text-[#2563EB]">{personal.githubUrl}</span>}
-          {personal.portfolioUrl && <span className="text-[#2563EB]">{personal.portfolioUrl}</span>}
+        <div className="mt-1 flex flex-col items-center gap-0.5 text-xs text-slate-300 justify-center">
+          <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
+            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB] hover:underline">{personal.email}</a>}
+            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB] hover:underline">{personal.phone}</a>}
+            {personal.location && <span>{personal.location}</span>}
+          </div>
+          <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
+            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.linkedinUrl}</a>}
+            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.githubUrl}</a>}
+            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.portfolioUrl}</a>}
+          </div>
         </div>
         {personal.summary && (
-          <p className="mt-3 text-xs leading-relaxed text-slate-300">{personal.summary}</p>
+          <p className="mt-3 w-full text-xs leading-relaxed text-slate-300">{personal.summary}</p>
         )}
       </div>
 
@@ -777,8 +791,12 @@ function ResumePreview({ data }: { data: ResumeData }) {
     function updateScale() {
       if (!containerRef.current || !pageRef.current) return
       const containerWidth = containerRef.current.clientWidth
+      const containerHeight = containerRef.current.clientHeight
       const pageWidth = 794
-      setScale(Math.min(containerWidth / pageWidth, 1))
+      const pageHeight = 1123
+      const scaleX = containerWidth / pageWidth
+      const scaleY = containerHeight / pageHeight
+      setScale(Math.min(scaleX, scaleY, 1))
     }
 
     updateScale()
@@ -792,11 +810,11 @@ function ResumePreview({ data }: { data: ResumeData }) {
     : MinimalTemplate
 
   return (
-    <div ref={containerRef} className="overflow-hidden">
+    <div ref={containerRef} className="w-full h-full overflow-x-hidden overflow-y-auto flex justify-center items-start py-2">
       <div
         ref={pageRef}
-        className="origin-top-left shadow-lg"
-        style={{ transform: `scale(${scale})`, width: 794, maxHeight: 1120 }}
+        className="origin-top shadow-lg bg-white flex-shrink-0"
+        style={{ transform: `scale(${scale})`, width: 794, height: 1123, overflow: 'hidden' }}
       >
         <Template data={data} />
       </div>
@@ -810,7 +828,7 @@ function PrintableResume({ data }: { data: ResumeData }) {
     : MinimalTemplate
 
   return (
-    <div className="print-only">
+    <div className="print-only" id="resume-capture">
       <Template data={data} />
     </div>
   )
@@ -1267,7 +1285,6 @@ export default function BuilderClient() {
   const [showModal, setShowModal] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
     try {
@@ -1291,10 +1308,17 @@ export default function BuilderClient() {
     if (mounted) localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   }, [data, mounted])
 
-  const handleDownload = useCallback(() => {
-    setShowModal(false)
-    setTimeout(() => window.print(), 100)
-  }, [])
+  const handleDownload = useCallback(async () => {
+    try {
+      const pdfBlob = await generateResumePdf(data)
+      downloadPdf(pdfBlob, `resume-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.pdf`)
+      setShowModal(false)
+    } catch (error) {
+      console.error('PDF download failed:', error)
+      setShowModal(false)
+      window.print()
+    }
+  }, [data])
 
   const handleReset = useCallback(() => {
     setData(defaultResumeData)
@@ -1402,23 +1426,23 @@ export default function BuilderClient() {
                 >
                   Change Template
                 </button>
-                {/* Mobile preview toggle */}
-                <button
-                  onClick={() => setShowPreview(!showPreview)}
-                  className="rounded-lg border border-accent bg-accent/5 px-3 py-2 text-sm font-medium text-accent lg:hidden"
-                >
-                  {showPreview ? 'Hide Preview' : 'Preview'}
-                </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Preview Panel */}
-        <div className={`flex-1 overflow-hidden bg-slate-200 p-2 preview-container ${showPreview ? 'flex flex-col' : 'hidden md:flex md:flex-col'}`}>
-          <div className="mx-auto w-full max-w-[794px] flex-1 overflow-y-auto">
+        {/* Desktop Preview Panel - Hidden on mobile */}
+        <div className="hidden md:flex flex-1 overflow-hidden bg-slate-200 flex flex-col md:p-2 preview-container">
+          <div className="mx-auto flex w-full max-w-[794px] flex-1 items-start justify-center overflow-hidden">
             <ResumePreview data={data} />
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Preview - Below form on small screens */}
+      <div className="md:hidden no-print bg-slate-200 flex flex-col items-center justify-center p-2">
+        <div className="mx-auto flex w-full max-w-[794px] flex-col items-start justify-center overflow-hidden">
+          <ResumePreview data={data} />
         </div>
       </div>
 

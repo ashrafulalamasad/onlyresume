@@ -4,10 +4,10 @@ import BuilderClient from './BuilderClient'
 export const metadata: Metadata = {
   title: 'Resume Builder — Create Your Professional Resume',
   description:
-    'Build your professional resume with our free online builder. Choose from premium templates, fill in your details, and download a pixel-perfect A4 PDF instantly.',
+    'Build your professional, ATS-friendly resume with our free online builder. Fill in your details, choose a template, customize your design, and download a pixel-perfect PDF instantly. No signup required, completely private.',
   openGraph: {
     title: 'Resume Builder — Create Your Professional Resume',
-    description: 'Build your professional resume for free. No signup required.',
+    description: 'Build your professional resume for free. No signup required, no credit card needed.',
     url: 'https://onlyresume.vercel.app/builder',
   },
 }
