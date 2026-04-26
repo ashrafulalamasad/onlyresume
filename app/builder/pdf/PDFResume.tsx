@@ -26,8 +26,8 @@ export default function PDFResume({ data }: PDFResumeProps) {
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
+      <Page size="A4" style={styles.page} wrap>
+        <View style={styles.container} wrap>
           <Template data={data} />
         </View>
       </Page>

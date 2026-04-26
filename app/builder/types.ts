@@ -28,6 +28,7 @@ export interface EducationItem {
   startDate: string
   endDate: string
   gpa: string
+  location: string
 }
 
 export interface ProjectItem {
@@ -51,11 +52,17 @@ export interface CertificationItem {
   date: string
 }
 
+export interface SkillCategory {
+  id: string
+  category: string
+  skills: string[]
+}
+
 export interface ResumeData {
   personal: PersonalInfo
   experience: ExperienceItem[]
   education: EducationItem[]
-  skills: string[]
+  skillCategories: SkillCategory[]
   projects: ProjectItem[]
   languages: LanguageItem[]
   certifications: CertificationItem[]
@@ -78,7 +85,7 @@ export const defaultResumeData: ResumeData = {
   },
   experience: [],
   education: [],
-  skills: [],
+  skillCategories: [],
   projects: [],
   languages: [],
   certifications: [],

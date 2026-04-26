@@ -37,6 +37,9 @@ function migrateResumeData(raw: Record<string, unknown>): ResumeData {
   const projects = (d.projects ?? []) as Record<string, unknown>[]
   const languages = (d.languages ?? []) as Record<string, unknown>[]
   const certifications = (d.certifications ?? []) as Record<string, unknown>[]
+  const skillCategories = (d.skillCategories ?? []) as Record<string, unknown>[]
+  const oldSkills = (d.skills as string[]) ?? []
+
   return {
     personal: {
       fullName: (personal.fullName as string) ?? '',
@@ -66,8 +69,17 @@ function migrateResumeData(raw: Record<string, unknown>): ResumeData {
       startDate: (edu.startDate as string) ?? '',
       endDate: (edu.endDate as string) ?? '',
       gpa: (edu.gpa as string) ?? '',
+      location: (edu.location as string) ?? '',
     })),
-    skills: (d.skills as string[]) ?? [],
+    skillCategories: skillCategories.length > 0
+      ? skillCategories.map((sc) => ({
+          id: (sc.id as string) ?? generateId(),
+          category: (sc.category as string) ?? '',
+          skills: (sc.skills as string[]) ?? [],
+        }))
+      : oldSkills.length > 0
+      ? [{ id: generateId(), category: 'Skills', skills: oldSkills }]
+      : [],
     projects: projects.map((p) => ({
       id: (p.id as string) ?? generateId(),
       title: (p.title as string) ?? '',
@@ -215,10 +227,14 @@ const sampleResumeData: ResumeData = {
     { id: '3', title: 'Junior Developer', company: 'CodeCraft Solutions', city: 'Dhaka', state: '', startDate: 'Jan 2018', endDate: 'May 2019', description: '• Developed responsive front-end interfaces using React and TypeScript\n• Wrote unit and integration tests achieving 85% code coverage' },
   ],
   education: [
-    { id: '1', school: 'University of Dhaka', degree: 'B.Sc. in Computer Science & Engineering', startDate: 'Jan 2014', endDate: 'Dec 2017', gpa: '3.7 / 4.0' },
-    { id: '2', school: 'Dhaka City College', degree: 'Higher Secondary Certificate (HSC)', startDate: 'Jun 2011', endDate: 'May 2013', gpa: '' },
+    { id: '1', school: 'University of Dhaka', degree: 'B.Sc. in Computer Science & Engineering', startDate: 'Jan 2014', endDate: 'Dec 2017', gpa: '3.7 / 4.0', location: 'Dhaka, Bangladesh' },
+    { id: '2', school: 'Dhaka City College', degree: 'Higher Secondary Certificate (HSC)', startDate: 'Jun 2011', endDate: 'May 2013', gpa: '', location: 'Dhaka, Bangladesh' },
   ],
-  skills: ['JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'Git', 'REST APIs', 'GraphQL'],
+  skillCategories: [
+    { id: '1', category: 'Frontend', skills: ['JavaScript', 'TypeScript', 'React', 'Next.js'] },
+    { id: '2', category: 'Backend', skills: ['Node.js', 'PostgreSQL', 'MongoDB', 'REST APIs', 'GraphQL'] },
+    { id: '3', category: 'DevOps', skills: ['Docker', 'AWS', 'Git'] },
+  ],
   projects: [
     { id: '1', title: 'E-Commerce Platform', techStack: 'Next.js, Stripe, PostgreSQL, Redis', description: '• Full-stack marketplace with real-time inventory tracking and payment processing\n• Handles 10K+ monthly transactions with automated order management', liveLink: 'shopapp.dev' },
     { id: '2', title: 'Task Management App', techStack: 'React, Node.js, Socket.io, MongoDB', description: '• Real-time collaborative task board with drag-and-drop interface\n• Supports team workspaces, file attachments, and activity logging', liveLink: 'taskflow.io' },
@@ -350,7 +366,7 @@ function TemplateSelectionScreen({ data, onChange, onContinue }: {
 // ─── Resume Preview Templates ────────────────────────────────
 
 function MinimalTemplate({ data }: { data: ResumeData }) {
-  const { personal, experience, education, skills, projects, languages, certifications } = data
+  const { personal, experience, education, skillCategories, projects, languages, certifications } = data
   return (
     <div className="resume-page">
       <div className="border-b-2 border-[#2563EB] pb-4 text-center">
@@ -360,14 +376,14 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
         )}
         <div className="mt-1 flex flex-col items-center gap-0.5 text-xs text-[#64748B]">
           <div className="flex gap-x-4 gap-y-0.5 text-xs text-[#64748B] justify-center flex-nowrap">
-            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB] hover:underline">{personal.email}</a>}
-            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB] hover:underline">{personal.phone}</a>}
+            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB]">{personal.email}</a>}
+            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB]">{personal.phone}</a>}
             {personal.location && <span>{personal.location}</span>}
           </div>
           <div className="flex gap-x-4 gap-y-0.5 text-xs text-[#64748B] justify-center flex-nowrap">
-            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.linkedinUrl}</a>}
-            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.githubUrl}</a>}
-            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.portfolioUrl}</a>}
+            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.linkedinUrl}</a>}
+            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.githubUrl}</a>}
+            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.portfolioUrl}</a>}
           </div>
         </div>
       </div>
@@ -375,7 +391,7 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
       {personal.summary && (
         <div className="mt-4">
           <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Summary</h2>
-          <p className="mt-1 text-xs leading-relaxed text-[#334155]">{personal.summary}</p>
+          <p className="mt-1 text-xs leading-relaxed text-[#334155] max-w-3xl">{personal.summary}</p>
         </div>
       )}
 
@@ -387,14 +403,14 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0F172A]">{exp.title || 'Job Title'}</h3>
-                  <p className="text-xs text-[#64748B]">
-                    {exp.company || 'Company'}
-                    {(exp.city || exp.state) && ` · ${[exp.city, exp.state].filter(Boolean).join(', ')}`}
-                  </p>
+                  <p className="text-xs text-[#64748B]">{exp.company || 'Company'}</p>
                 </div>
-                <span className="shrink-0 text-xs text-[#94A3B8]">
-                  {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
-                </span>
+                <div className="text-right">
+                  {(exp.city || exp.state) && <p className="text-xs text-[#64748B]">{[exp.city, exp.state].filter(Boolean).join(', ')}</p>}
+                  <span className="shrink-0 text-xs text-[#94A3B8]">
+                    {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
+                  </span>
+                </div>
               </div>
               {exp.description && (
                 <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-[#334155]">{exp.description}</p>
@@ -417,21 +433,27 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
                     {edu.gpa && ` · GPA: ${edu.gpa}`}
                   </p>
                 </div>
-                <span className="shrink-0 text-xs text-[#94A3B8]">
-                  {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
-                </span>
+                <div className="text-right">
+                  {edu.location && <p className="text-xs text-[#64748B]">{edu.location}</p>}
+                  <span className="shrink-0 text-xs text-[#94A3B8]">
+                    {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {skills.length > 0 && (
+      {skillCategories.length > 0 && (
         <div className="mt-4">
           <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Skills</h2>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {skills.map((skill, i) => (
-              <span key={i} className="rounded bg-[#F1F5F9] px-2 py-0.5 text-xs text-[#334155]">{skill}</span>
+          <div className="mt-2 space-y-1">
+            {skillCategories.map((cat) => (
+              <div key={cat.id}>
+                <span className="text-xs font-semibold text-[#0F172A]">{cat.category}:</span>
+                <span className="text-xs text-[#334155] ml-1">{cat.skills.join(', ')}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -475,9 +497,14 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
           <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Certifications</h2>
           {certifications.map((cert) => (
             <div key={cert.id} className="mt-2 flex items-start justify-between">
-              <div>
+              <div className="flex items-center flex-wrap gap-1.5">
                 <h3 className="text-sm font-semibold text-[#0F172A]">{cert.name || 'Certification'}</h3>
-                {cert.issuer && <p className="text-xs text-[#64748B]">{cert.issuer}</p>}
+                {cert.issuer && (
+                  <>
+                    <span className="text-[#94A3B8]">|</span>
+                    <p className="text-sm text-[#0F172A]">{cert.issuer}</p>
+                  </>
+                )}
               </div>
               {cert.date && <span className="shrink-0 text-xs text-[#94A3B8]">{cert.date}</span>}
             </div>
@@ -489,7 +516,7 @@ function MinimalTemplate({ data }: { data: ResumeData }) {
 }
 
 function CorporateTemplate({ data }: { data: ResumeData }) {
-  const { personal, experience, education, skills, projects, languages, certifications } = data
+  const { personal, experience, education, skillCategories, projects, languages, certifications } = data
   return (
     <div className="resume-page flex">
       <div className="w-[260px] shrink-0 bg-[#0F172A] p-[36px] text-white">
@@ -499,61 +526,44 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
             <p className="mt-1 text-xs text-[#2563EB]">{personal.professionTitle}</p>
           )}
         </div>
-        <div className="mt-3 space-y-1 text-xs text-slate-300 text-center">
-          <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
-            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB] hover:underline">{personal.email}</a>}
-            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB] hover:underline">{personal.phone}</a>}
-            {personal.location && <p>{personal.location}</p>}
-          </div>
-          <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
-            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.linkedinUrl}</a>}
-            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.githubUrl}</a>}
-            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.portfolioUrl}</a>}
-          </div>
+        <div className="mt-4 flex flex-col gap-1.5 text-xs text-slate-300 text-left w-full break-words">
+          {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB]">{personal.email}</a>}
+          {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB]">{personal.phone}</a>}
+          {personal.location && <p>{personal.location}</p>}
+          {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.linkedinUrl}</a>}
+          {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.githubUrl}</a>}
+          {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.portfolioUrl}</a>}
         </div>
 
         {personal.summary && (
           <div className="mt-6">
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">About</h2>
-            <p className="mt-2 text-xs leading-relaxed text-slate-300">{personal.summary}</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-300 text-justify">{personal.summary}</p>
           </div>
         )}
 
-        {skills.length > 0 && (
+        {skillCategories.length > 0 && (
           <div className="mt-6">
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Skills</h2>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {skills.map((skill, i) => (
-                <span key={i} className="rounded bg-white/10 px-2 py-0.5 text-xs text-slate-200">{skill}</span>
+            <div className="mt-2 space-y-1.5">
+              {skillCategories.map((cat) => (
+                <div key={cat.id} className="w-full break-words">
+                  <span className="text-xs font-semibold text-slate-200">{cat.category}:</span>
+                  <span className="text-xs text-slate-300 ml-1">{cat.skills.join(', ')}</span>
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {education.length > 0 && (
-          <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Education</h2>
-            {education.map((edu) => (
-              <div key={edu.id} className="mt-3">
-                <h3 className="text-sm font-semibold">{edu.degree || 'Degree'}</h3>
-                <p className="text-xs text-slate-300">
-                  {edu.school || 'School'}
-                  {edu.gpa && ` · GPA: ${edu.gpa}`}
-                </p>
-                <p className="text-xs text-slate-400">
-                  {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+
 
         {languages.length > 0 && (
           <div className="mt-6">
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Languages</h2>
             <div className="mt-2 space-y-1">
               {languages.map((lang) => (
-                <div key={lang.id} className="flex items-center justify-between text-xs">
+                <div key={lang.id} className="flex items-center justify-between text-xs w-full break-words">
                   <span className="text-slate-200">{lang.language || 'Language'}</span>
                   <span className="text-slate-400">{lang.proficiency}</span>
                 </div>
@@ -562,38 +572,26 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
           </div>
         )}
 
-        {certifications.length > 0 && (
-          <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Certifications</h2>
-            {certifications.map((cert) => (
-              <div key={cert.id} className="mt-2">
-                <h3 className="text-xs font-semibold">{cert.name || 'Certification'}</h3>
-                <p className="text-xs text-slate-400">
-                  {cert.issuer}{cert.date ? ` · ${cert.date}` : ''}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+
       </div>
 
-      <div className="flex-1 p-[36px]">
+      <div className="flex-1 pt-2 pb-2 pl-4">
         {experience.length > 0 && (
           <div>
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#0F172A]">Experience</h2>
             {experience.map((exp) => (
-              <div key={exp.id} className="mt-4 border-b border-[#E2E8F0] pb-4 last:border-0">
+              <div key={exp.id} className="mt-2 border-b border-[#E2E8F0] pb-2 last:border-0">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-[#0F172A]">{exp.title || 'Job Title'}</h3>
-                    <p className="text-xs text-[#64748B]">
-                      {exp.company || 'Company'}
-                      {(exp.city || exp.state) && ` · ${[exp.city, exp.state].filter(Boolean).join(', ')}`}
-                    </p>
+                    <p className="text-xs text-[#64748B]">{exp.company || 'Company'}</p>
                   </div>
-                  <span className="shrink-0 text-xs text-[#94A3B8]">
-                    {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
-                  </span>
+                  <div className="text-right">
+                    {(exp.city || exp.state) && <p className="text-xs text-[#64748B]">{[exp.city, exp.state].filter(Boolean).join(', ')}</p>}
+                    <span className="shrink-0 text-xs text-[#94A3B8]">
+                      {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
+                    </span>
+                  </div>
                 </div>
                 {exp.description && (
                   <p className="mt-2 whitespace-pre-line text-xs leading-relaxed text-[#334155]">{exp.description}</p>
@@ -604,10 +602,10 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
         )}
 
         {projects.length > 0 && (
-          <div className={experience.length > 0 ? 'mt-5' : ''}>
+          <div className={experience.length > 0 ? 'mt-3' : ''}>
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#0F172A]">Projects</h2>
             {projects.map((proj) => (
-              <div key={proj.id} className="mt-3 border-b border-[#E2E8F0] pb-3 last:border-0">
+              <div key={proj.id} className="mt-2 border-b border-[#E2E8F0] pb-2 last:border-0">
                 <div className="flex items-start justify-between">
                   <h3 className="text-sm font-semibold text-[#0F172A]">{proj.title || 'Project Title'}</h3>
                   {proj.liveLink && <span className="shrink-0 text-xs text-[#2563EB]">{proj.liveLink}</span>}
@@ -623,7 +621,51 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
           </div>
         )}
 
-        {experience.length === 0 && projects.length === 0 && education.length === 0 && (
+        {education.length > 0 && (
+          <div className={experience.length > 0 || projects.length > 0 ? 'mt-3' : ''}>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#0F172A]">Education</h2>
+            {education.map((edu) => (
+              <div key={edu.id} className="mt-2 border-b border-[#E2E8F0] pb-2 last:border-0">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold text-[#0F172A]">{edu.degree || 'Degree'}</h3>
+                    <p className="text-xs text-[#64748B]">
+                      {edu.school || 'School'}
+                      {edu.gpa && ` · GPA: ${edu.gpa}`}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    {edu.location && <p className="text-xs text-[#64748B]">{edu.location}</p>}
+                    <span className="shrink-0 text-xs text-[#94A3B8]">
+                      {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {certifications.length > 0 && (
+          <div className={experience.length > 0 || projects.length > 0 || education.length > 0 ? 'mt-3' : ''}>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#0F172A]">Certifications</h2>
+            {certifications.map((cert) => (
+              <div key={cert.id} className="mt-2 border-b border-[#E2E8F0] pb-2 last:border-0">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 pr-4">
+                    <p className="text-xs text-[#334155]">
+                      <span className="text-sm font-semibold text-[#0F172A]">{cert.name || 'Certification'}</span>
+                      {cert.issuer && <span> | {cert.issuer}</span>}
+                    </p>
+                  </div>
+                  {cert.date && <span className="shrink-0 text-xs text-[#94A3B8]">{cert.date}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {experience.length === 0 && projects.length === 0 && education.length === 0 && certifications.length === 0 && (
           <div className="flex h-full items-center justify-center text-sm text-[#94A3B8]">
             Add your experience to see it here
           </div>
@@ -634,7 +676,7 @@ function CorporateTemplate({ data }: { data: ResumeData }) {
 }
 
 function ModernTemplate({ data }: { data: ResumeData }) {
-  const { personal, experience, education, skills, projects, languages, certifications } = data
+  const { personal, experience, education, skillCategories, projects, languages, certifications } = data
   return (
     <div className="resume-page">
       <div className="bg-[#0F172A] px-[48px] py-[36px] text-center">
@@ -644,18 +686,18 @@ function ModernTemplate({ data }: { data: ResumeData }) {
         )}
         <div className="mt-1 flex flex-col items-center gap-0.5 text-xs text-slate-300 justify-center">
           <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
-            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB] hover:underline">{personal.email}</a>}
-            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB] hover:underline">{personal.phone}</a>}
+            {personal.email && <a href={`mailto:${personal.email}`} className="text-[#2563EB]">{personal.email}</a>}
+            {personal.phone && <a href={`tel:${personal.phone}`} className="text-[#2563EB]">{personal.phone}</a>}
             {personal.location && <span>{personal.location}</span>}
           </div>
           <div className="flex gap-x-4 gap-y-0.5 text-xs text-slate-300 justify-center flex-nowrap">
-            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.linkedinUrl}</a>}
-            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.githubUrl}</a>}
-            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">{personal.portfolioUrl}</a>}
+            {personal.linkedinUrl && <a href={personal.linkedinUrl.startsWith('http') ? personal.linkedinUrl : `https://${personal.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.linkedinUrl}</a>}
+            {personal.githubUrl && <a href={personal.githubUrl.startsWith('http') ? personal.githubUrl : `https://${personal.githubUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.githubUrl}</a>}
+            {personal.portfolioUrl && <a href={personal.portfolioUrl.startsWith('http') ? personal.portfolioUrl : `https://${personal.portfolioUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#2563EB]">{personal.portfolioUrl}</a>}
           </div>
         </div>
         {personal.summary && (
-          <p className="mt-3 w-full text-xs leading-relaxed text-slate-300">{personal.summary}</p>
+          <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-300">{personal.summary}</p>
         )}
       </div>
 
@@ -670,14 +712,14 @@ function ModernTemplate({ data }: { data: ResumeData }) {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-[#0F172A]">{exp.title || 'Job Title'}</h3>
-                    <p className="text-xs text-[#64748B]">
-                      {exp.company || 'Company'}
-                      {(exp.city || exp.state) && ` · ${[exp.city, exp.state].filter(Boolean).join(', ')}`}
-                    </p>
+                    <p className="text-xs text-[#64748B]">{exp.company || 'Company'}</p>
                   </div>
-                  <span className="shrink-0 text-xs text-[#94A3B8]">
-                    {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
-                  </span>
+                  <div className="text-right">
+                    {(exp.city || exp.state) && <p className="text-xs text-[#64748B]">{[exp.city, exp.state].filter(Boolean).join(', ')}</p>}
+                    <span className="shrink-0 text-xs text-[#94A3B8]">
+                      {exp.startDate}{exp.endDate ? ` — ${exp.endDate}` : ''}
+                    </span>
+                  </div>
                 </div>
                 {exp.description && (
                   <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-[#334155]">{exp.description}</p>
@@ -702,23 +744,29 @@ function ModernTemplate({ data }: { data: ResumeData }) {
                       {edu.gpa && ` · GPA: ${edu.gpa}`}
                     </p>
                   </div>
-                  <span className="shrink-0 text-xs text-[#94A3B8]">
-                    {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
-                  </span>
+                  <div className="text-right">
+                    {edu.location && <p className="text-xs text-[#64748B]">{edu.location}</p>}
+                    <span className="shrink-0 text-xs text-[#94A3B8]">
+                      {edu.startDate}{edu.endDate ? ` — ${edu.endDate}` : ''}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {skills.length > 0 && (
+        {skillCategories.length > 0 && (
           <div>
             <h2 className="border-b-2 border-[#2563EB] pb-1 text-sm font-bold uppercase tracking-widest text-[#2563EB]">
               Skills
             </h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {skills.map((skill, i) => (
-                <span key={i} className="rounded bg-[#2563EB]/10 px-3 py-1 text-xs font-medium text-[#2563EB]">{skill}</span>
+            <div className="mt-3 space-y-2">
+              {skillCategories.map((cat) => (
+                <div key={cat.id}>
+                  <span className="text-xs font-semibold text-[#0F172A]">{cat.category}:</span>
+                  <span className="text-xs text-[#334155] ml-1">{cat.skills.join(', ')}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -768,9 +816,14 @@ function ModernTemplate({ data }: { data: ResumeData }) {
             </h2>
             {certifications.map((cert) => (
               <div key={cert.id} className="mt-3 flex items-start justify-between">
-                <div>
+                <div className="flex items-center flex-wrap gap-1.5">
                   <h3 className="text-sm font-semibold text-[#0F172A]">{cert.name || 'Certification'}</h3>
-                  {cert.issuer && <p className="text-xs text-[#64748B]">{cert.issuer}</p>}
+                  {cert.issuer && (
+                    <>
+                      <span className="text-[#94A3B8]">|</span>
+                      <p className="text-sm text-[#0F172A]">{cert.issuer}</p>
+                    </>
+                  )}
                 </div>
                 {cert.date && <span className="shrink-0 text-xs text-[#94A3B8]">{cert.date}</span>}
               </div>
@@ -783,38 +836,25 @@ function ModernTemplate({ data }: { data: ResumeData }) {
 }
 
 function ResumePreview({ data }: { data: ResumeData }) {
-  const containerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
-
-  useEffect(() => {
-    function updateScale() {
-      if (!containerRef.current || !pageRef.current) return
-      const containerWidth = containerRef.current.clientWidth
-      const containerHeight = containerRef.current.clientHeight
-      const pageWidth = 794
-      const pageHeight = 1123
-      const scaleX = containerWidth / pageWidth
-      const scaleY = containerHeight / pageHeight
-      setScale(Math.min(scaleX, scaleY, 1))
-    }
-
-    updateScale()
-    const observer = new ResizeObserver(updateScale)
-    if (containerRef.current) observer.observe(containerRef.current)
-    return () => observer.disconnect()
-  }, [])
 
   const Template = data.template === 'corporate' ? CorporateTemplate
     : data.template === 'modern' ? ModernTemplate
     : MinimalTemplate
 
   return (
-    <div ref={containerRef} className="w-full h-full overflow-x-hidden overflow-y-auto flex justify-center items-start py-2">
+    <div className="w-full h-full overflow-x-hidden overflow-y-auto flex flex-col items-center py-4 bg-slate-300">
       <div
         ref={pageRef}
-        className="origin-top shadow-lg bg-white flex-shrink-0"
-        style={{ transform: `scale(${scale})`, width: 794, height: 1123, overflow: 'hidden' }}
+        className="relative"
+        style={{ 
+          width: 794, 
+          minHeight: 1123,
+          backgroundImage: 'linear-gradient(to bottom, white 0px, white 1123px, transparent 1123px, transparent 1143px)',
+          backgroundSize: '100% 1143px',
+          filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1)) drop-shadow(0 4px 6px rgba(0,0,0,0.1))',
+          paddingBottom: 20 /* ensure content doesn't get cut off at the very bottom */
+        }}
       >
         <Template data={data} />
       </div>
@@ -1004,7 +1044,7 @@ function EducationForm({ data, onChange }: { data: ResumeData; onChange: (d: Res
   const addItem = () =>
     onChange({
       ...data,
-      education: [...data.education, { id: generateId(), school: '', degree: '', startDate: '', endDate: '', gpa: '' }],
+      education: [...data.education, { id: generateId(), school: '', degree: '', startDate: '', endDate: '', gpa: '', location: '' }],
     })
 
   const updateItem = (id: string, field: keyof EducationItem, value: string) =>
@@ -1049,10 +1089,17 @@ function EducationForm({ data, onChange }: { data: ResumeData; onChange: (d: Res
                   placeholder="May 2020" className={INPUT_CLASS} />
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-medium text-primary">GPA (optional)</label>
-              <input type="text" value={edu.gpa} onChange={(e) => updateItem(edu.id, 'gpa', e.target.value)}
-                placeholder="3.8 / 4.0" className={INPUT_CLASS} />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium text-primary">GPA (optional)</label>
+                <input type="text" value={edu.gpa} onChange={(e) => updateItem(edu.id, 'gpa', e.target.value)}
+                  placeholder="3.8 / 4.0" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-primary">Location</label>
+                <input type="text" value={edu.location} onChange={(e) => updateItem(edu.id, 'location', e.target.value)}
+                  placeholder="New York, NY" className={INPUT_CLASS} />
+              </div>
             </div>
           </div>
         </div>
@@ -1066,46 +1113,125 @@ function EducationForm({ data, onChange }: { data: ResumeData; onChange: (d: Res
 }
 
 function SkillsForm({ data, onChange }: { data: ResumeData; onChange: (d: ResumeData) => void }) {
-  const [input, setInput] = useState('')
+  const [categoryName, setCategoryName] = useState('')
+  const [skillInput, setSkillInput] = useState('')
 
-  const addSkill = () => {
-    const skill = input.trim()
-    if (skill && !data.skills.includes(skill)) {
-      onChange({ ...data, skills: [...data.skills, skill] })
-      setInput('')
+  const addCategory = () => {
+    const cat = categoryName.trim()
+    if (cat && !data.skillCategories.some((s) => s.category.toLowerCase() === cat.toLowerCase())) {
+      onChange({
+        ...data,
+        skillCategories: [...data.skillCategories, { id: generateId(), category: cat, skills: [] }],
+      })
+      setCategoryName('')
     }
   }
 
-  const removeSkill = (skill: string) =>
-    onChange({ ...data, skills: data.skills.filter((s) => s !== skill) })
+  const addSkillToCategory = (categoryId: string) => {
+    const skill = skillInput.trim()
+    if (skill) {
+      onChange({
+        ...data,
+        skillCategories: data.skillCategories.map((cat) =>
+          cat.id === categoryId && !cat.skills.includes(skill)
+            ? { ...cat, skills: [...cat.skills, skill] }
+            : cat
+        ),
+      })
+      setSkillInput('')
+    }
+  }
+
+  const removeCategory = (categoryId: string) =>
+    onChange({
+      ...data,
+      skillCategories: data.skillCategories.filter((cat) => cat.id !== categoryId),
+    })
+
+  const removeSkill = (categoryId: string, skill: string) =>
+    onChange({
+      ...data,
+      skillCategories: data.skillCategories.map((cat) =>
+        cat.id === categoryId ? { ...cat, skills: cat.skills.filter((s) => s !== skill) } : cat
+      ),
+    })
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <input
-          type="text" value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-          placeholder="e.g. JavaScript, Project Management, Excel"
-          className={`flex-1 ${INPUT_CLASS}`}
-        />
-        <button onClick={addSkill}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90">
-          Add
-        </button>
-      </div>
-      {data.skills.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {data.skills.map((skill) => (
-            <span key={skill} className="inline-flex items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-sm text-primary border border-border">
-              {skill}
-              <button onClick={() => removeSkill(skill)} className="ml-1 text-slate-400 hover:text-red-500">&times;</button>
-            </span>
-          ))}
+      <div className="rounded-lg border border-border bg-white p-4">
+        <h3 className="text-sm font-semibold text-primary mb-3">Add Category</h3>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+            placeholder="e.g. Frontend, Backend, DevOps"
+            className={`flex-1 ${INPUT_CLASS}`}
+          />
+          <button
+            onClick={addCategory}
+            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+          >
+            Add Category
+          </button>
         </div>
-      )}
-      {data.skills.length === 0 && (
-        <p className="text-sm text-foreground">Type a skill and press Enter or click Add.</p>
+      </div>
+
+      {data.skillCategories.map((category, idx) => (
+        <div key={category.id} className="rounded-lg border border-border bg-white p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-primary">
+              {category.category}
+              <button
+                onClick={() => removeCategory(category.id)}
+                className="ml-2 text-xs text-red-500 hover:text-red-700"
+              >
+                Remove Category
+              </button>
+            </h3>
+          </div>
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              value={skillInput}
+              onChange={(e) => setSkillInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillToCategory(category.id))}
+              placeholder="Add a skill"
+              className={`flex-1 ${INPUT_CLASS}`}
+            />
+            <button
+              onClick={() => addSkillToCategory(category.id)}
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+            >
+              Add
+            </button>
+          </div>
+          {category.skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {category.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="inline-flex items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-sm text-primary border border-border"
+                >
+                  {skill}
+                  <button
+                    onClick={() => removeSkill(category.id, skill)}
+                    className="ml-1 text-slate-400 hover:text-red-500"
+                  >
+                    &times;
+                  </button>
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-foreground">Add skills to this category</p>
+          )}
+        </div>
+      ))}
+
+      {data.skillCategories.length === 0 && (
+        <p className="text-sm text-foreground">Create a category to get started</p>
       )}
     </div>
   )
@@ -1432,16 +1558,16 @@ export default function BuilderClient() {
         </div>
 
         {/* Desktop Preview Panel - Hidden on mobile */}
-        <div className="hidden md:flex flex-1 overflow-hidden bg-slate-200 flex flex-col md:p-2 preview-container">
-          <div className="mx-auto flex w-full max-w-[794px] flex-1 items-start justify-center overflow-hidden">
+        <div className="hidden md:flex flex-1 overflow-hidden bg-slate-300 flex flex-col md:p-2">
+          <div className="mx-auto w-full max-w-[794px] flex-1">
             <ResumePreview data={data} />
           </div>
         </div>
       </div>
 
       {/* Mobile Preview - Below form on small screens */}
-      <div className="md:hidden no-print bg-slate-200 flex flex-col items-center justify-center p-2">
-        <div className="mx-auto flex w-full max-w-[794px] flex-col items-start justify-center overflow-hidden">
+      <div className="md:hidden no-print bg-slate-300 flex flex-col items-center p-2">
+        <div className="mx-auto w-full max-w-[794px]">
           <ResumePreview data={data} />
         </div>
       </div>

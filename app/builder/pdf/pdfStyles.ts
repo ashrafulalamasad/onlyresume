@@ -87,6 +87,7 @@ export const styles = StyleSheet.create({
   column: {
     flexDirection: 'column' as const,
     display: 'flex',
+    width: '100%',
   },
 
   // Minimal template specific
@@ -114,6 +115,8 @@ export const styles = StyleSheet.create({
     fontSize: FONT_SIZES.xs,
     color: COLORS.accent,
     marginRight: SPACING.xs,
+    cursor: 'pointer',
+    textDecoration: 'none',
   },
 
   // Corporate template specific
@@ -236,8 +239,9 @@ export const styles = StyleSheet.create({
 
   link: {
     color: COLORS.accent,
-    textDecoration: 'underline',
+    textDecoration: 'none',
     fontSize: FONT_SIZES.xs,
+    cursor: 'pointer',
   },
 
   divider: {
