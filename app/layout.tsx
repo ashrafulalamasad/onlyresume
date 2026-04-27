@@ -24,7 +24,12 @@ export const metadata: Metadata = {
   },
   description:
     "Build a professional, ATS-friendly resume in minutes. No sign-up, no credit card, always free. Instant PDF download with modern templates. Privacy-focused CV maker that keeps your data safe.",
-  keywords: [
+  
+  verification: {
+    google: "tOL16GFOGBOOCyWx2Wv-E0B1nzd_d_kmPKQeVkmrW8Q",
+  },
+  
+    keywords: [
     "resume builder",
     "free resume builder",
     "online resume maker",
