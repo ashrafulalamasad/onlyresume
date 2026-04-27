@@ -1,11 +1,11 @@
-import { StyleSheet } from '@react-pdf/renderer'
-import { A4, COLORS, SPACING, FONT_SIZES, FONT_WEIGHTS } from './pdfConfig'
+import { StyleSheet } from "@react-pdf/renderer";
+import { A4, COLORS, SPACING, FONT_SIZES, FONT_WEIGHTS } from "./pdfConfig";
 
 export const styles = StyleSheet.create({
   // Layout
   page: {
     padding: A4.margin,
-    fontFamily: 'Helvetica',
+    fontFamily: "Helvetica",
     fontSize: FONT_SIZES.base,
     color: COLORS.text,
   },
@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.primary,
     marginBottom: SPACING.sm,
-    textAlign: 'center' as const,
+    textAlign: "center" as const,
   },
 
   sectionHeader: {
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     color: COLORS.accent,
     marginBottom: SPACING.xs,
     marginTop: SPACING.md,
-    textTransform: 'uppercase' as const,
+    textTransform: "uppercase" as const,
     letterSpacing: 2,
   },
 
@@ -68,26 +68,26 @@ export const styles = StyleSheet.create({
 
   // Flex layouts
   row: {
-    flexDirection: 'row' as const,
-    display: 'flex',
+    flexDirection: "row" as const,
+    display: "flex",
   },
 
   rowBetween: {
-    flexDirection: 'row' as const,
-    display: 'flex',
-    justifyContent: 'space-between' as const,
+    flexDirection: "row" as const,
+    display: "flex",
+    justifyContent: "space-between" as const,
   },
 
   rowCenter: {
-    flexDirection: 'row' as const,
-    display: 'flex',
-    alignItems: 'center' as const,
+    flexDirection: "row" as const,
+    display: "flex",
+    alignItems: "center" as const,
   },
 
   column: {
-    flexDirection: 'column' as const,
-    display: 'flex',
-    width: '100%',
+    flexDirection: "column" as const,
+    display: "flex",
+    width: "100%",
   },
 
   // Minimal template specific
@@ -95,7 +95,7 @@ export const styles = StyleSheet.create({
     borderBottom: `2pt solid ${COLORS.accent}`,
     paddingBottom: SPACING.sm,
     marginBottom: SPACING.md,
-    textAlign: 'center' as const,
+    textAlign: "center" as const,
   },
 
   minimalName: {
@@ -107,7 +107,7 @@ export const styles = StyleSheet.create({
 
   minimalTitle: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.secondary,
+    color: "#303030",
     marginBottom: SPACING.xs,
   },
 
@@ -115,45 +115,45 @@ export const styles = StyleSheet.create({
     fontSize: FONT_SIZES.xs,
     color: COLORS.accent,
     marginRight: SPACING.xs,
-    cursor: 'pointer',
-    textDecoration: 'none',
+    cursor: "pointer",
+    textDecoration: "none",
   },
 
   // Corporate template specific
   corporateContainer: {
-    flexDirection: 'row' as const,
-    display: 'flex',
+    flexDirection: "row" as const,
+    display: "flex",
   },
 
   corporateSidebar: {
-    width: 175,
+    width: 180,
     backgroundColor: COLORS.primary,
     color: COLORS.white,
-    padding: 18,
-    flexDirection: 'column' as const,
-    display: 'flex',
+    padding: 13,
+    flexDirection: "column" as const,
+    display: "flex",
   },
 
   corporateContent: {
     flex: 1,
-    flexDirection: 'column' as const,
-    display: 'flex',
+    flexDirection: "column" as const,
+    display: "flex",
     paddingLeft: 12,
   },
 
   sidebarTitle: {
-    fontSize: FONT_SIZES.xl,
+    fontSize: 15,
     fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.white,
     marginBottom: SPACING.xs,
-    textAlign: 'center' as const,
+    textAlign: "center" as const,
   },
 
   sidebarSubtitle: {
     fontSize: FONT_SIZES.xs,
     color: COLORS.accent,
     marginBottom: SPACING.sm,
-    textAlign: 'center' as const,
+    textAlign: "center" as const,
   },
 
   sidebarSection: {
@@ -165,7 +165,7 @@ export const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.accent,
     marginBottom: SPACING.xs,
-    textTransform: 'uppercase' as const,
+    textTransform: "uppercase" as const,
     letterSpacing: 2,
   },
 
@@ -190,13 +190,13 @@ export const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.white,
     marginBottom: SPACING.xs,
-    textAlign: 'center' as const,
+    textAlign: "center" as const,
   },
 
   modernContactInfo: {
     fontSize: FONT_SIZES.xs,
     color: COLORS.accent,
-    textAlign: 'center' as const,
+    textAlign: "center" as const,
     marginRight: SPACING.xs,
   },
 
@@ -211,7 +211,7 @@ export const styles = StyleSheet.create({
     borderBottom: `2pt solid ${COLORS.accent}`,
     paddingBottom: SPACING.xs,
     marginBottom: SPACING.sm,
-    textTransform: 'uppercase' as const,
+    textTransform: "uppercase" as const,
     letterSpacing: 2,
   },
 
@@ -239,13 +239,13 @@ export const styles = StyleSheet.create({
 
   link: {
     color: COLORS.accent,
-    textDecoration: 'none',
+    textDecoration: "none",
     fontSize: FONT_SIZES.xs,
-    cursor: 'pointer',
+    cursor: "pointer",
   },
 
   divider: {
     borderTop: `1pt solid ${COLORS.border}`,
     marginVertical: SPACING.sm,
   },
-})
+});
