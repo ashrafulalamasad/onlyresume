@@ -111,7 +111,7 @@ export default function Navbar() {
       {/* Mobile Backdrop Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 top-[65px] z-40 bg-black/20 md:hidden"
+          className="fixed inset-0 top-16.5 z-40 bg-black/20 md:hidden"
           onClick={closeMobileMenu}
           aria-hidden="true"
         />
@@ -119,7 +119,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu - Slides from Right */}
       <div
-        className={`fixed right-0 top-[65px] z-40 w-64 border-l border-border bg-surface shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed right-0 top-16.5 z-40 w-64 border-l border-border bg-surface shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

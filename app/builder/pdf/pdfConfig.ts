@@ -44,4 +44,3 @@ export const FONT_WEIGHTS = {
 } as const
 
 export const CONTENT_WIDTH = A4.width - A4.margin * 2
-

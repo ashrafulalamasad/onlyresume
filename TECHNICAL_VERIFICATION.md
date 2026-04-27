@@ -95,7 +95,7 @@
 ### CorporateTemplate (Already Correct ✅)
 ```jsx
 <div className="resume-page flex">  {/* No extra padding */}
-  <div className="w-[260px] shrink-0 ...">
+  <div className="w-65 shrink-0 ...">
     {/* Left sidebar */}
   </div>
   <div className="flex-1 ...">

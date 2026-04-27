@@ -16,7 +16,7 @@ Removed the extra `p-[48px]` class from the MinimalTemplate component in `app/bu
 
 ### Before:
 ```jsx
-<div className="resume-page p-[48px]">
+<div className="resume-page p-12">
 ```
 
 ### After:

@@ -56,7 +56,7 @@ export default function Footer() {
 
         {/* Desktop/Tablet Layout: Logo + text and both link columns in one row */}
         <div className="hidden sm:flex sm:items-start sm:justify-around">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <h3 className="text-2xl font-bold text-white">Only<span className="text-accent">Resume</span></h3>
             <p className="mt-2 max-w-xs text-sm text-slate-400">
               Build professional, ATS-friendly resumes in minutes. Free, no signup required, always private.

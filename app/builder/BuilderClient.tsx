@@ -17,23 +17,10 @@ import type {
   CertificationItem,
 } from "./types";
 import { defaultResumeData } from "./types";
-import {
-  validateEmail,
-  validateUrl,
-  validatePhone,
-  sanitizeInput,
-} from "./validation";
 import { generateResumePdf, downloadPdf } from "./pdfGenerator";
 import { getUrlDisplayText, getUrlHref } from "./urlUtils";
 
 const STORAGE_KEY = "onlyresume-data";
-
-const PROGRESS_STEPS = [
-  { label: "Select Template", number: 1 },
-  { label: "Add Your Info", number: 2 },
-  { label: "Add Sections", number: 3 },
-  { label: "Download PDF", number: 4 },
-];
 
 const SECTION_NAV: { key: FormStep; label: string }[] = [
   { key: "personal", label: "Personal" },
@@ -1420,7 +1407,10 @@ function ResumePreview({ data }: { data: ResumeData }) {
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-full overflow-auto flex flex-col items-center justify-start py-4 bg-slate-300 px-2">
+    <div
+      ref={containerRef}
+      className="w-full h-full overflow-auto flex flex-col items-center justify-start py-4 bg-slate-300 px-2"
+    >
       <div
         ref={pageRef}
         className="origin-top"
@@ -1993,7 +1983,7 @@ function SkillsForm({
         </div>
       </div>
 
-      {data.skillCategories.map((category, idx) => (
+      {data.skillCategories.map((category) => (
         <div
           key={category.id}
           className="rounded-lg border border-border bg-white p-4"

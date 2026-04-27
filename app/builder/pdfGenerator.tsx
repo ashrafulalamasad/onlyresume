@@ -27,12 +27,3 @@ export function downloadPdf(blob: Blob, filename: string): void {
     URL.revokeObjectURL(url)
   }, 100)
 }
-
-
-
-
-
-
-
-
-

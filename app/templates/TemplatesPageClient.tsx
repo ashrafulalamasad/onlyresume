@@ -7,17 +7,17 @@ import { MinimalTemplate, CorporateTemplate, ModernTemplate, sampleResumeData } 
 const templates = [
   {
     id: 'minimal',
-    name: 'Minimal',
+    name: 'Classic',
     description: 'Clean and simple. Lets your content speak for itself with elegant whitespace and subtle accent lines.',
   },
   {
     id: 'corporate',
-    name: 'Corporate',
+    name: 'Modern Sidebar',
     description: 'Bold sidebar layout with a dark panel for contact details. Perfect for corporate and executive roles.',
   },
   {
     id: 'modern',
-    name: 'Modern',
+    name: 'Corporate Header',
     description: 'Full-width colored header with bold section dividers. Ideal for creative and tech professionals.',
   },
 ]
@@ -78,7 +78,7 @@ export default function TemplatesPageClient() {
       <div className="mt-8 grid gap-6 sm:mt-12 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
         {templates.map((t) => (
           <div key={t.id} className="overflow-hidden rounded-xl border border-border bg-surface">
-            <div className="aspect-[210/297] overflow-hidden border-b border-border bg-gray-50" data-nosnippet aria-label={`${t.name} template preview`}>
+            <div className="aspect-210/297 overflow-hidden border-b border-border bg-gray-50" data-nosnippet aria-label={`${t.name} template preview`}>
               <TemplatePreview templateId={t.id as 'minimal' | 'corporate' | 'modern'} />
             </div>
             <div className="p-5">
