@@ -1,0 +1,20 @@
+// Barrel re-exports for the 17 new web templates. The 3 original templates
+// (minimal, corporate, modern) stay inline in BuilderClient.tsx; this barrel
+// only covers the additional templates added under ./templates.
+export { AcademicTemplate } from './academic'
+export { AtsTemplate } from './ats'
+export { BoldTemplate } from './bold'
+export { CompactTemplate } from './compact'
+export { CreativeTemplate } from './creative'
+export { ElegantTemplate } from './elegant'
+export { EmeraldTemplate } from './emerald'
+export { ExecutiveTemplate } from './executive'
+export { GeometricTemplate } from './geometric'
+export { GridTemplate } from './grid'
+export { SidebarRightTemplate } from './sidebar-right'
+export { SlateTemplate } from './slate'
+export { SplitTemplate } from './split'
+export { TechnicalTemplate } from './technical'
+export { TimelineTemplate } from './timeline'
+export { TwoColumnTemplate } from './two-column'
+export { WarmTemplate } from './warm'
