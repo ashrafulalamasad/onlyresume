@@ -19,6 +19,26 @@ import type {
 import { defaultResumeData } from "./types";
 import { generateResumePdf, downloadPdf } from "./pdfGenerator";
 import { getUrlDisplayText, getUrlHref } from "./urlUtils";
+import {
+  AcademicTemplate,
+  AtsTemplate,
+  BoldTemplate,
+  CompactTemplate,
+  CreativeTemplate,
+  ElegantTemplate,
+  EmeraldTemplate,
+  ExecutiveTemplate,
+  GeometricTemplate,
+  GridTemplate,
+  SidebarRightTemplate,
+  SlateTemplate,
+  SplitTemplate,
+  TechnicalTemplate,
+  TimelineTemplate,
+  TwoColumnTemplate,
+  WarmTemplate,
+} from "./templates";
+import { TEMPLATES, isTemplateId } from "./templateConfig";
 
 const STORAGE_KEY = "onlyresume-data";
 
@@ -113,7 +133,7 @@ function migrateResumeData(raw: Record<string, unknown>): ResumeData {
       issuer: (c.issuer as string) ?? "",
       date: (c.date as string) ?? "",
     })),
-    template: ["minimal", "corporate", "modern"].includes(d.template as string)
+    template: isTemplateId(d.template as string)
       ? (d.template as ResumeData["template"])
       : "minimal",
   };
@@ -406,12 +426,7 @@ function TemplatePreviewCard({
   templateId: ResumeData["template"];
 }) {
   const previewData = { ...sampleResumeData, template: templateId };
-  const Template =
-    templateId === "corporate"
-      ? CorporateTemplate
-      : templateId === "modern"
-        ? ModernTemplate
-        : MinimalTemplate;
+  const Template = TEMPLATE_MAP[templateId];
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -457,26 +472,7 @@ function TemplateSelectionScreen({
   onChange: (d: ResumeData) => void;
   onContinue: () => void;
 }) {
-  const templates = [
-    {
-      id: "minimal" as const,
-      name: "Classic",
-      description:
-        "Clean and simple. Lets your content speak for itself with elegant whitespace and subtle accent lines.",
-    },
-    {
-      id: "corporate" as const,
-      name: "Modern Sidebar",
-      description:
-        "Bold sidebar layout with a dark panel for contact details. Perfect for corporate and executive roles.",
-    },
-    {
-      id: "modern" as const,
-      name: "Corporate Header",
-      description:
-        "Full-width colored header with bold section dividers. Ideal for creative and tech professionals.",
-    },
-  ];
+  // Use the shared TEMPLATES metadata for names and descriptions
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
@@ -488,8 +484,8 @@ function TemplateSelectionScreen({
           Choose a design that best represents your professional brand.
         </p>
       </div>
-      <div className="mt-8 grid gap-6 sm:grid-cols-3">
-        {templates.map((t) => (
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {TEMPLATES.map((t) => (
           <button
             key={t.id}
             onClick={() => onChange({ ...data, template: t.id })}
@@ -1375,17 +1371,35 @@ function ModernTemplate({ data }: { data: ResumeData }) {
   );
 }
 
+const TEMPLATE_MAP = {
+  minimal: MinimalTemplate,
+  corporate: CorporateTemplate,
+  modern: ModernTemplate,
+  academic: AcademicTemplate,
+  ats: AtsTemplate,
+  bold: BoldTemplate,
+  compact: CompactTemplate,
+  creative: CreativeTemplate,
+  elegant: ElegantTemplate,
+  emerald: EmeraldTemplate,
+  executive: ExecutiveTemplate,
+  geometric: GeometricTemplate,
+  grid: GridTemplate,
+  "sidebar-right": SidebarRightTemplate,
+  slate: SlateTemplate,
+  split: SplitTemplate,
+  technical: TechnicalTemplate,
+  timeline: TimelineTemplate,
+  "two-column": TwoColumnTemplate,
+  warm: WarmTemplate,
+} as const;
+
 function ResumePreview({ data }: { data: ResumeData }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  const Template =
-    data.template === "corporate"
-      ? CorporateTemplate
-      : data.template === "modern"
-        ? ModernTemplate
-        : MinimalTemplate;
+  const Template = TEMPLATE_MAP[data.template];
 
   useEffect(() => {
     function updateScale() {
@@ -1432,12 +1446,7 @@ function ResumePreview({ data }: { data: ResumeData }) {
 }
 
 function PrintableResume({ data }: { data: ResumeData }) {
-  const Template =
-    data.template === "corporate"
-      ? CorporateTemplate
-      : data.template === "modern"
-        ? ModernTemplate
-        : MinimalTemplate;
+  const Template = TEMPLATE_MAP[data.template];
 
   return (
     <div className="print-only" id="resume-capture">
@@ -2392,7 +2401,7 @@ export default function BuilderClient() {
     } catch {}
     const params = new URLSearchParams(window.location.search);
     const t = params.get("template");
-    if (t === "minimal" || t === "corporate" || t === "modern") {
+    if (t && isTemplateId(t)) {
       setData((d) => ({ ...d, template: t }));
       setStep("personal");
     }
@@ -2621,4 +2630,4 @@ export default function BuilderClient() {
   );
 }
 
-export { MinimalTemplate, CorporateTemplate, ModernTemplate, sampleResumeData };
+export { MinimalTemplate, CorporateTemplate, ModernTemplate, sampleResumeData, TEMPLATE_MAP };

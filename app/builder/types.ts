@@ -58,6 +58,28 @@ export interface SkillCategory {
   skills: string[]
 }
 
+export type TemplateId =
+  | 'minimal'
+  | 'corporate'
+  | 'modern'
+  | 'elegant'
+  | 'executive'
+  | 'technical'
+  | 'academic'
+  | 'timeline'
+  | 'creative'
+  | 'ats'
+  | 'compact'
+  | 'bold'
+  | 'emerald'
+  | 'slate'
+  | 'geometric'
+  | 'split'
+  | 'grid'
+  | 'sidebar-right'
+  | 'warm'
+  | 'two-column'
+
 export interface ResumeData {
   personal: PersonalInfo
   experience: ExperienceItem[]
@@ -66,7 +88,7 @@ export interface ResumeData {
   projects: ProjectItem[]
   languages: LanguageItem[]
   certifications: CertificationItem[]
-  template: 'minimal' | 'corporate' | 'modern'
+  template: TemplateId
 }
 
 export type FormStep = 'template' | 'personal' | 'experience' | 'education' | 'skills' | 'projects' | 'languages' | 'certifications'
