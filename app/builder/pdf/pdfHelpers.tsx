@@ -1,4 +1,5 @@
 import { View, Text, Link } from "@react-pdf/renderer";
+import type { Style } from "@react-pdf/stylesheet";
 import type { ContactItem } from "../templates/contacts";
 
 /**
@@ -14,11 +15,7 @@ export function normalizeText(text: string): string {
   return text.replace(/\r/g, "").replace(/([^\n])\n([^\n])/g, "$1 $2");
 }
 
-interface TextStyle {
-  fontSize?: number;
-  color?: string;
-  fontWeight?: number;
-}
+type TextStyle = Style;
 
 /** One contact item — clickable link when it has an href, plain text otherwise. */
 export function PdfContactText({
