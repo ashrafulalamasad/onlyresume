@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { TEMPLATE_MAP, sampleResumeData } from '@/app/builder/BuilderClient'
+import { TEMPLATE_MAP, sampleResumeData } from '@/app/builder/sharedData'
 import { TEMPLATES } from '@/app/builder/templateConfig'
 import type { TemplateId } from '@/app/builder/types'
 

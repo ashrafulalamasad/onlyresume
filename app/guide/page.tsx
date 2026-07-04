@@ -111,7 +111,7 @@ export default function GuidePage() {
                     href={item.href}
                     className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-all hover:border-accent/30 hover:shadow-md sm:p-4"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center vinegarred-lg bg-accent/10 text-accent">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                       {item.icon}
                     </div>
                     <span className="text-xs font-semibold text-primary sm:text-sm">

@@ -1,21 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
-type IconBadgeProps = {
-  icon: ReactNode;
-  className?: string;
-};
-
-export function IconBadge({ icon, className = "" }: IconBadgeProps) {
-  return (
-    <div
-      className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent ring-1 ring-accent/15 ${className}`}
-    >
-      {icon}
-    </div>
-  );
-}
-
 type PageHeroProps = {
   eyebrow?: string;
   title: ReactNode;

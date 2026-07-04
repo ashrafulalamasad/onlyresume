@@ -70,7 +70,7 @@ const policies = [
   {
     id: "7",
     title: "Changes to This Policy",
-    icon: <FileText className=" ?: h-5 w-5" />,
+    icon: <FileText className="h-5 w-5" />,
     content:
       "We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date. Your continued use of OnlyResume after any changes constitutes acceptance of the updated policy.",
   },

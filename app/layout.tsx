@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -71,7 +71,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@onlyresume",
     title: "OnlyResume | 100% Free Resume Builder - No Login",
     description:
       "Build a professional, ATS-friendly resume in minutes. Always free, no signup required.",
@@ -88,6 +87,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -181,7 +185,7 @@ export default function RootLayout({
               url: "https://onlyresume.vercel.app",
               logo: "https://onlyresume.vercel.app/icon.png",
               description: "Free resume builder with no login required",
-              sameAs: ["https://twitter.com/onlyresume"],
+              sameAs: [],
             }).replace(/</g, "\\u003c"),
           }}
         />

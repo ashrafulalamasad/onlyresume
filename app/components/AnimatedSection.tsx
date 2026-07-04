@@ -1,11 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ElementType,
+  type ReactNode,
+} from "react";
+
+type AnimationKind =
+  | "fade-up"
+  | "fade-in"
+  | "scale-in"
+  | "slide-left"
+  | "slide-right";
 
 interface AnimatedSectionProps {
-  as?: string;
+  as?: ElementType;
   children: ReactNode;
-  animation?: "fade-up" | "fade-in" | "scale-in" | "slide-left" | "slide-right";
+  animation?: AnimationKind;
   delay?: number;
   duration?: number;
   className?: string;
@@ -14,6 +27,7 @@ interface AnimatedSectionProps {
 }
 
 export default function AnimatedSection({
+  as: Tag = "div",
   children,
   animation = "fade-up",
   delay = 0,
@@ -22,7 +36,7 @@ export default function AnimatedSection({
   once = true,
   threshold = 0.1,
 }: AnimatedSectionProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -38,7 +52,7 @@ export default function AnimatedSection({
           setIsVisible(false);
         }
       },
-      { threshold }
+      { threshold },
     );
 
     observer.observe(el);
@@ -48,7 +62,7 @@ export default function AnimatedSection({
   const animationClass = `animate-${animation}`;
 
   return (
-    <div
+    <Tag
       ref={ref}
       className={`${animationClass} ${isVisible ? "is-visible" : ""} ${className}`}
       style={{
@@ -58,6 +72,6 @@ export default function AnimatedSection({
       }}
     >
       {children}
-    </div>
+    </Tag>
   );
 }

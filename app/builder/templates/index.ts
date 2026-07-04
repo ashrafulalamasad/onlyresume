@@ -1,6 +1,6 @@
-// Barrel re-exports for the 17 new web templates. The 3 original templates
-// (minimal, corporate, modern) stay inline in BuilderClient.tsx; this barrel
-// only covers the additional templates added under ./templates.
+export { MinimalTemplate } from './minimal'
+export { CorporateTemplate } from './corporate'
+export { ModernTemplate } from './modern'
 export { AcademicTemplate } from './academic'
 export { AtsTemplate } from './ats'
 export { BoldTemplate } from './bold'
