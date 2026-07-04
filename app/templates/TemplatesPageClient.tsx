@@ -2,31 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { MinimalTemplate, CorporateTemplate, ModernTemplate, sampleResumeData } from '@/app/builder/BuilderClient'
+import { TEMPLATE_MAP, sampleResumeData } from '@/app/builder/BuilderClient'
+import { TEMPLATES } from '@/app/builder/templateConfig'
+import type { TemplateId } from '@/app/builder/types'
 
-const templates = [
-  {
-    id: 'minimal',
-    name: 'Classic',
-    description: 'Clean and simple. Lets your content speak for itself with elegant whitespace and subtle accent lines.',
-  },
-  {
-    id: 'corporate',
-    name: 'Modern Sidebar',
-    description: 'Bold sidebar layout with a dark panel for contact details. Perfect for corporate and executive roles.',
-  },
-  {
-    id: 'modern',
-    name: 'Corporate Header',
-    description: 'Full-width colored header with bold section dividers. Ideal for creative and tech professionals.',
-  },
-]
-
-function TemplatePreview({ templateId }: { templateId: 'minimal' | 'corporate' | 'modern' }) {
+function TemplatePreview({ templateId }: { templateId: TemplateId }) {
   const previewData = { ...sampleResumeData, template: templateId }
-  const Template = templateId === 'corporate' ? CorporateTemplate
-    : templateId === 'modern' ? ModernTemplate
-    : MinimalTemplate
+  const Template = TEMPLATE_MAP[templateId]
   const containerRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
   const [mounted, setMounted] = useState(false)
@@ -70,23 +52,23 @@ export default function TemplatesPageClient() {
       <div className="text-center">
         <h1 className="text-3xl font-extrabold tracking-tight text-primary sm:text-4xl">Resume Templates</h1>
         <p className="mx-auto mt-3 max-w-2xl text-base text-foreground sm:mt-4 sm:text-lg">
-          Three professionally designed, ATS-friendly layouts. Pick the one that fits your style,
+          Twenty professionally designed, ATS-friendly layouts. Pick the one that fits your style,
           then customize it in the builder.
         </p>
       </div>
 
       <div className="mt-8 grid gap-6 sm:mt-12 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
-        {templates.map((t) => (
-          <div key={t.id} className="overflow-hidden rounded-xl border border-border bg-surface">
+        {TEMPLATES.map((t) => (
+          <div key={t.id} className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface">
             <div className="aspect-210/297 overflow-hidden border-b border-border bg-gray-50" data-nosnippet aria-label={`${t.name} template preview`}>
-              <TemplatePreview templateId={t.id as 'minimal' | 'corporate' | 'modern'} />
+              <TemplatePreview templateId={t.id} />
             </div>
-            <div className="p-5">
+            <div className="flex flex-1 flex-col p-5">
               <h2 className="text-lg font-bold text-primary">{t.name}</h2>
-              <p className="mt-1 text-sm text-foreground">{t.description}</p>
+              <p className="mt-1 pb-4 sm:pb-6 text-sm text-foreground">{t.description}</p>
               <Link
                 href={`/builder?template=${t.id}`}
-                className="mt-4 inline-flex h-10 items-center rounded-lg bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+                className="mt-auto inline-flex h-10 items-center rounded-lg bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
               >
                 Use This Template
               </Link>
