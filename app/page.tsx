@@ -1,17 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PageHero, SectionHeader } from "./components/PageHero";
+import AnimatedSection from "./components/AnimatedSection";
+import {
+  Check,
+  ChevronRight,
+  Download,
+  FileText,
+  Lock,
+  Shield,
+  Sparkles,
+  Star,
+  Zap,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "OnlyResume | 100% Free Resume Builder - No Login Required",
   description:
-    "Build a professional, ATS-friendly resume in minutes. No sign-up, no credit card, always free. Instant PDF download with modern templates. Privacy-focused CV maker that keeps your data safe.",
-  alternates: {
-    canonical: "/",
-  },
+    "Build a professional, ATS-friendly resume in minutes. No sign-up, no credit card, always free. Instant PDF download with 20+ modern templates. Privacy-focused CV maker.",
+  alternates: { canonical: "/" },
   openGraph: {
     title: "OnlyResume | 100% Free Resume Builder - No Login Required",
     description:
-      "Build a professional, ATS-friendly resume in minutes. No sign-up, no credit card, always free. Instant PDF download with modern templates. Privacy-focused CV maker that keeps your data safe.",
+      "Build a professional, ATS-friendly resume in minutes. No sign-up, no credit card, always free. Instant PDF download with modern templates.",
     url: "https://onlyresume.vercel.app",
     images: [
       {
@@ -24,69 +35,48 @@ export const metadata: Metadata = {
   },
 };
 
+const stats = [
+  { value: "20+", label: "Templates" },
+  { value: "100%", label: "Free" },
+  { value: "No", label: "Signup" },
+  { value: "ATS", label: "Optimized" },
+];
+
 const features = [
   {
+    icon: <Shield className="h-6 w-6" />,
     title: "Completely Free",
     description:
       "No hidden fees, no premium tiers. Build and download your resume at zero cost. Always free, forever.",
-    icon: (
-      <svg
-        className="h-8 w-8 text-accent"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        aria-label="Checkmark icon"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-        />
-      </svg>
-    ),
   },
   {
+    icon: <Lock className="h-6 w-6" />,
     title: "No Signup Required",
     description:
-      "Start building immediately. Your data stays in your browser — private and secure. No login, no account creation.",
-    icon: (
-      <svg
-        className="h-8 w-8 text-accent"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        aria-label="Lock icon"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-        />
-      </svg>
-    ),
+      "Start building immediately. Your data stays in your browser — private and secure. No login, no account.",
   },
   {
+    icon: <FileText className="h-6 w-6" />,
     title: "ATS-Friendly Templates",
     description:
-      "Clean, structured layouts that pass Applicant Tracking Systems with ease. Designed for recruiters and employers.",
-    icon: (
-      <svg
-        className="h-8 w-8 text-accent"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        aria-label="Document icon"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-        />
-      </svg>
-    ),
+      "20 clean, structured layouts that pass Applicant Tracking Systems with ease. Engineered for recruiters.",
+  },
+  {
+    icon: <Zap className="h-6 w-6" />,
+    title: "Instant PDF Download",
+    description: "Export a pixel-perfect A4 PDF with a single click. No watermarks, no delays, no extra software.",
+  },
+  {
+    icon: <Sparkles className="h-6 w-6" />,
+    title: "20+ Templates",
+    description:
+      "From Minimal and Corporate to Creative and Technical. Every style for every industry and career level.",
+  },
+  {
+    icon: <Download className="h-6 w-6" />,
+    title: "No Watermarks",
+    description:
+      "Your PDF is completely clean and unbranded. Just a professional resume ready to send to employers.",
   },
 ];
 
@@ -95,234 +85,328 @@ const steps = [
     step: "01",
     title: "Fill in Your Details",
     description:
-      "Enter your personal info, experience, education, and skills using our guided form.",
+      "Enter your personal info, experience, education, and skills using our guided form. Your data stays private.",
   },
   {
     step: "02",
-    title: "Choose a Template",
+    title: "Pick from 20 Templates",
     description:
-      "Pick from three premium, professional layouts designed to impress recruiters.",
+      "Choose a design that fits your industry and personality. Switch anytime without losing data.",
   },
   {
     step: "03",
     title: "Download as PDF",
     description:
-      "Export a pixel-perfect A4 PDF ready to send to employers. No watermarks.",
+      "Export a pixel-perfect A4 PDF with a single click. No watermarks, no third-party services.",
   },
 ];
+
+const templateCategories = [
+  "Minimal",
+  "Corporate",
+  "Modern",
+  "Creative",
+  "Technical",
+  "Executive",
+  "Academic",
+  "ATS",
+];
+
+function FeatureCard({
+  feature,
+  index,
+}: {
+  feature: (typeof features)[0];
+  index: number;
+}) {
+  return (
+    <div
+      className="stagger-item rounded-2xl border border-border bg-surface p-6 transition-all hover:border-accent/20 hover:shadow-lg sm:p-8"
+      style={{ transitionDelay: `${index * 100}ms` }}
+    >
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent transition-transform group-hover:scale-110">
+        {feature.icon}
+      </div>
+      <h3 className="mt-5 text-lg font-bold text-primary">{feature.title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-foreground sm:text-base">
+        {feature.description}
+      </p>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
     <>
-      <section className="bg-surface">
-        <div className="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 sm:py-20 lg:py-28">
-          <h1 className="text-3xl font-extrabold tracking-tight text-primary sm:text-4xl md:text-5xl lg:text-6xl">
-            Build Your Professional Resume
-            <span className="block text-accent">In Minutes, Not Hours</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-foreground sm:mt-6 sm:text-lg">
-            Create a polished, ATS-friendly resume with our free online builder.
-            No signup required, no downloads needed, no watermarks. Just a
-            beautiful resume ready to land your next job.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-center sm:gap-4">
-            <Link
-              href="/builder"
-              className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-8 text-base font-semibold text-white transition-colors hover:bg-accent/90"
-            >
-              Start Building — It&apos;s Free
-            </Link>
-            <Link
-              href="/templates"
-              className="inline-flex h-12 items-center justify-center rounded-lg border border-black bg-surface px-8 text-base font-semibold text-primary transition-colors hover:bg-background"
-            >
-              View Templates
-            </Link>
+      {/* Hero */}
+      <PageHero
+        eyebrow="Free Resume Builder"
+        title={
+          <>
+            Build Your Professional Resume{" "}
+            <span className="text-accent">In Minutes, Not Hours</span>
+          </>
+        }
+        description="Create a polished, ATS-friendly resume with our free online builder. No signup required, no downloads needed, no watermarks. Just a beautiful resume ready to land your next job."
+        ctas={[
+          {
+            label: "Start Building — It's Free",
+            href: "/builder",
+            variant: undefined,
+          },
+          { label: "Browse 20 Templates", href: "/templates", variant: "ghost" },
+        ]}
+      />
+
+      {/* Stats Bar */}
+      <section className="border-y border-border bg-surface py-8 sm:py-10">
+        <AnimatedSection animation="scale-in" as="div">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-3xl font-extrabold text-accent sm:text-4xl">
+                    {stat.value}
+                  </div>
+                  <div className="mt-1 text-sm font-medium text-foreground sm:text-base">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </AnimatedSection>
       </section>
 
+      {/* Features */}
       <section className="py-12 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h2 className="text-center text-2xl font-bold text-primary sm:text-3xl">
-            Why Choose OnlyResume?
-          </h2>
-          <div className="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
-            {features.map((f) => (
-              <div
+          <AnimatedSection animation="fade-up" as="div">
+            <SectionHeader
+              eyebrow="Why Choose OnlyResume"
+              title="Everything you need in a resume builder"
+              description="No compromises. No hidden costs. Just a powerful, private, and completely free resume-building experience."
+            />
+          </AnimatedSection>
+
+          <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <AnimatedSection
                 key={f.title}
-                className="rounded-xl border border-border bg-surface p-5 text-center sm:p-6"
+                animation="fade-up"
+                delay={i * 80}
+                as="div"
               >
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 sm:mb-4 sm:h-14 sm:w-14">
-                  {f.icon}
-                </div>
-                <h3 className="text-base font-semibold text-primary sm:text-lg">
-                  {f.title}
-                </h3>
-                <p className="mt-1.5 text-sm text-foreground sm:mt-2">
-                  {f.description}
-                </p>
-              </div>
+                <FeatureCard feature={f} index={i} />
+              </AnimatedSection>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Templates Showcase */}
       <section className="bg-surface py-12 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h2 className="text-center text-2xl font-bold text-primary sm:text-3xl">
-            How It Works
-          </h2>
-          <div className="mt-8 grid gap-6 sm:mt-12 sm:grid-cols-3 sm:gap-8">
-            {steps.map((s) => (
-              <div key={s.step} className="text-center">
-                <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-accent text-base font-bold text-white sm:h-12 sm:w-12 sm:text-lg">
-                  {s.step}
+          <AnimatedSection animation="fade-up" as="div">
+            <SectionHeader
+              eyebrow="20+ Templates"
+              title="A template for every career and personality"
+              description="From minimal and corporate to creative and technical — explore a diverse collection of ATS-friendly resume templates designed for every industry."
+            />
+          </AnimatedSection>
+
+          <div className="mt-10 flex flex-wrap justify-center gap-3 sm:mt-12">
+            {templateCategories.map((cat, i) => (
+              <AnimatedSection
+                key={cat}
+                animation="scale-in"
+                delay={i * 50}
+                as="span"
+              >
+                <span className="inline-block rounded-full border border-border bg-background px-5 py-2 text-sm font-semibold text-primary transition-all hover:border-accent/30 hover:shadow-sm">
+                  {cat}
+                </span>
+              </AnimatedSection>
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <AnimatedSection animation="fade-up" delay={200} as="div">
+              <Link
+                href="/templates"
+                className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent/90 sm:text-base"
+              >
+                Browse All 20+ Templates
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Link>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-12 sm:py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <AnimatedSection animation="fade-up" as="div">
+            <SectionHeader
+              eyebrow="How It Works"
+              title="Three simple steps to your perfect resume"
+            />
+          </AnimatedSection>
+
+          <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-3 sm:gap-8">
+            {steps.map((s, i) => (
+              <AnimatedSection
+                key={s.step}
+                animation="fade-up"
+                delay={i * 150}
+                as="div"
+              >
+                <div className="relative rounded-2xl border border-border bg-surface p-6 text-center transition-all hover:border-accent/20 hover:shadow-lg sm:p-8">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent text-base font-bold text-white sm:h-16 sm:w-16 sm:text-lg">
+                    {s.step}
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold text-primary">
+                    {s.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground sm:text-base">
+                    {s.description}
+                  </p>
                 </div>
-                <h3 className="mt-3 text-base font-semibold text-primary sm:mt-4 sm:text-lg">
-                  {s.title}
-                </h3>
-                <p className="mt-1.5 text-sm text-foreground sm:mt-2">
-                  {s.description}
-                </p>
-              </div>
+              </AnimatedSection>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SEO Content Section */}
-      <section className="py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="space-y-6 text-foreground">
+      {/* Trust / Social Proof */}
+      <section className="bg-surface py-12 sm:py-16 lg:py-20">
+        <AnimatedSection animation="fade-up" as="div">
+          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent">
+              <Star className="h-3.5 w-3.5" />
+              Trusted by Job Seekers Worldwide
+            </div>
+            <h2 className="mt-4 text-2xl font-bold text-primary sm:text-3xl">
+              Built for privacy. Designed for results.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-foreground sm:text-lg">
+              OnlyResume has helped thousands of job seekers create
+              professional resumes — no cost, no signup, no compromise.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              {[
+                "No Credit Card",
+                "No Watermarks",
+                "No Data Collection",
+                "No Account Needed",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-medium text-primary">
+                    {item}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </AnimatedSection>
+      </section>
+
+      {/* SEO Content */}
+      <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+        <div className="space-y-10">
+          <AnimatedSection animation="fade-up" as="div">
             <div>
               <h2 className="text-2xl font-bold text-primary sm:text-3xl">
                 The Instant Resume Builder for Job Seekers
               </h2>
-              <p className="mt-4 text-base leading-relaxed">
+              <p className="mt-4 text-base leading-relaxed text-foreground">
                 OnlyResume is your complete instant CV maker and professional
                 resume builder, designed to help job seekers create compelling
-                applications in minutes. Whether you're a recent graduate
+                applications in minutes. Whether you are a recent graduate
                 building your first student resume, an experienced software
                 developer crafting a technical CV, or a career-changer looking
                 for a fresh start, our free online resume builder provides
                 everything you need.
               </p>
             </div>
+          </AnimatedSection>
 
+          <AnimatedSection animation="fade-up" as="div">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+                <h3 className="text-lg font-bold text-primary">
+                  Why You Need an ATS-Friendly Resume
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-foreground sm:text-base">
+                  In today&apos;s competitive job market, your resume is often
+                  your first impression. Modern recruiting relies heavily on
+                  Applicant Tracking Systems. Our 20 professionally designed
+                  ATS-friendly resume templates ensure your qualifications
+                  reach human recruiters.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+                <h3 className="text-lg font-bold text-primary">
+                  Free with Zero Hidden Costs
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-foreground sm:text-base">
+                  Unlike competing resume makers that charge premium fees,
+                  OnlyResume is completely free. No credit card required, no
+                  premium tiers, no hidden charges. Build unlimited resumes and
+                  download unlimited PDFs at zero cost.
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          <AnimatedSection animation="fade-up" as="div">
             <div>
-              <h3 className="text-xl font-semibold text-primary">
-                Why You Need a Professional ATS-Friendly Resume
+              <h3 className="text-xl font-bold text-primary">
+                20 Premium Resume Templates for Every Career Path
               </h3>
-              <p className="mt-3 text-base leading-relaxed">
-                In today's competitive job market, your resume is often your
-                first impression with potential employers. Modern recruiting
-                relies heavily on Applicant Tracking Systems (ATS) that scan and
-                filter resumes before a human ever sees them. Our professionally
-                designed ATS-friendly resume templates ensure your
-                qualifications aren't lost in the system, giving you the best
-                chance to land interviews and secure your dream job.
+              <p className="mt-3 text-base leading-relaxed text-foreground">
+                Our versatile resume maker works for every profession. Choose
+                from Minimal, Corporate, Modern, Academic, ATS, Bold, Compact,
+                Creative, Elegant, Emerald, Executive, Geometric, Grid, Sidebar
+                Right, Slate, Split, Technical, Timeline, Two Column, and Warm
+                templates. Each template adapts perfectly to highlight your
+                unique qualifications.
               </p>
             </div>
-
-            <div>
-              <h3 className="text-xl font-semibold text-primary">
-                Free Resume Builder with No Hidden Costs
-              </h3>
-              <p className="mt-3 text-base leading-relaxed">
-                Unlike competing resume makers that charge premium fees or
-                require subscriptions, OnlyResume is completely free. No credit
-                card required, no premium tiers, no hidden charges. Build
-                unlimited resumes, download as many PDFs as you need, and make
-                changes anytime—all at zero cost. We believe everyone deserves
-                access to professional resume-building tools without financial
-                barriers.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold text-primary">
-                Privacy-First: No Login Required
-              </h3>
-              <p className="mt-3 text-base leading-relaxed">
-                Your privacy matters. Our online CV maker keeps all your data
-                completely private and secure on your device. No login required,
-                no account creation needed, no tracking, and no data shared with
-                third parties. Your resume information stays exactly where you
-                want it—with you. Start building your professional resume
-                immediately without any account setup.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold text-primary">
-                Three Premium Resume Templates
-              </h3>
-              <ul className="mt-3 space-y-2 text-base">
-                <li>
-                  <strong>Classic Template:</strong> Clean, minimalist design
-                  perfect for all industries. Emphasizes content with elegant
-                  whitespace.
-                </li>
-                <li>
-                  <strong>Modern Sidebar Template:</strong> Professional dark
-                  sidebar layout ideal for corporate roles and executive
-                  positions.
-                </li>
-                <li>
-                  <strong>Bold Header Template:</strong> Contemporary full-width
-                  design perfect for creative professionals and tech developers.
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold text-primary">
-                Build Resumes for Every Career Path
-              </h3>
-              <p className="mt-3 text-base leading-relaxed">
-                Our versatile resume maker works for every profession. Create a
-                student resume for your first internship, develop a software
-                developer CV showcasing technical skills, build a corporate
-                executive resume, or craft a creative professional's portfolio
-                piece. Each template adapts perfectly to highlight your unique
-                qualifications and experience.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold text-primary">
-                Instant PDF Download
-              </h3>
-              <p className="mt-3 text-base leading-relaxed">
-                Export your completed resume as a pixel-perfect A4 PDF with a
-                single click. No watermarks, no delays, no additional software
-                needed. Your PDF is ready to email to employers, upload to job
-                boards, or print immediately. Create unlimited PDFs and download
-                them whenever you need.
-              </p>
-            </div>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <h2 className="text-2xl font-bold text-primary sm:text-3xl">
-            Ready to Land Your Dream Job?
-          </h2>
-          <p className="mt-3 text-base text-foreground sm:mt-4 sm:text-lg">
-            Join thousands of job seekers who built their winning resume with
-            OnlyResume. Create your professional CV today, completely free, no
-            signup required.
-          </p>
-          <Link
-            href="/builder"
-            className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-lg bg-accent px-8 text-base font-semibold text-white transition-colors hover:bg-accent/90 sm:mt-8 sm:w-auto"
-          >
-            Create Your Resume Now
-          </Link>
-        </div>
+      {/* Final CTA */}
+      <section className="bg-surface py-12 sm:py-16 lg:py-20">
+        <AnimatedSection animation="scale-in" as="div">
+          <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+            <h2 className="text-2xl font-bold text-primary sm:text-3xl lg:text-4xl">
+              Ready to Land Your Dream Job?
+            </h2>
+            <p className="mt-4 text-base text-foreground sm:text-lg">
+              Join thousands of job seekers who built their winning resume with
+              OnlyResume. Create your professional CV today, completely free, no
+              signup required.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link
+                href="/builder"
+                className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent/90 sm:text-base"
+              >
+                Create Your Resume Now
+              </Link>
+              <Link
+                href="/templates"
+                className="inline-flex h-12 items-center justify-center rounded-lg border border-border bg-surface px-8 text-sm font-semibold text-primary transition-colors hover:bg-background sm:text-base"
+              >
+                View Templates
+              </Link>
+            </div>
+          </div>
+        </AnimatedSection>
       </section>
     </>
   );

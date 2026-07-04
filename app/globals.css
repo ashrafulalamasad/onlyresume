@@ -35,6 +35,135 @@ body {
   overflow-x: hidden;
 }
 
+/* ===== Scroll-triggered Animation System ===== */
+
+/* Base: elements start hidden/off-position */
+.animate-fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.animate-fade-in {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.animate-scale-in {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-slide-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.animate-slide-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.animate-stagger {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+/* Visible state: all animations resolve to normal */
+.animate-fade-up.is-visible,
+.animate-fade-in.is-visible,
+.animate-scale-in.is-visible,
+.animate-slide-left.is-visible,
+.animate-slide-right.is-visible,
+.animate-stagger.is-visible {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+
+/* ===== Hero Load Animations ===== */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-hero-fade-up {
+  animation: hero-fade-up 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-hero-scale-in {
+  animation: hero-scale-in 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-float {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+/* Staggered hero children */
+.hero-stagger-1 { animation-delay: 0.1s; }
+.hero-stagger-2 { animation-delay: 0.2s; }
+.hero-stagger-3 { animation-delay: 0.3s; }
+.hero-stagger-4 { animation-delay: 0.4s; }
+.hero-stagger-5 { animation-delay: 0.5s; }
+
+/* ===== Card Hover Enhancements ===== */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.1);
+}
+
+/* ===== Pulse Effect for CTAs ===== */
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2.5s ease-in-out infinite;
+}
+
+/* ===== Subtle Background Decoration ===== */
+@keyframes subtle-drift {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(3px, -3px); }
+  66% { transform: translate(-2px, 2px); }
+}
+
+.animate-drift {
+  animation: subtle-drift 8s ease-in-out infinite;
+}
+
 /* A4 Page Container - Standard dimensions */
 .resume-page {
   /* A4 dimensions at 96 DPI: 794px × 1123px */

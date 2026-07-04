@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { PageHero, SectionHeader } from "../components/PageHero";
+import AnimatedSection from "../components/AnimatedSection";
+import {
+  BookOpen,
+  Check,
+  FileText,
+  Lightbulb,
+  Shield,
+  Sparkles,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title:
     "Resume Writing Guide — Master ATS, Keywords & Professional Formatting for 2025",
   description:
     "Comprehensive guide to writing resumes that pass ATS systems and impress recruiters. Learn formatting, keyword optimization, power verbs, common mistakes, and industry-specific tips.",
-  alternates: {
-    canonical: "/guide",
-  },
+  alternates: { canonical: "/guide" },
   openGraph: {
     title: "The Complete Resume Writing Guide — Beat ATS & Land Interviews",
     description:
@@ -24,6 +33,22 @@ export const metadata: Metadata = {
   },
 };
 
+const quickNav = [
+  { label: "Resume Formats", href: "#formats", icon: <FileText className="h-5 w-5" /> },
+  { label: "Section by Section", href: "#sections", icon: <BookOpen className="h-5 w-5" /> },
+  { label: "ATS Checklist", href: "#ats", icon: <Check className="h-5 w-5" /> },
+  { label: "Power Words", href: "#power-words", icon: <Sparkles className="h-5 w-5" /> },
+  { label: "Common Mistakes", href: "#mistakes", icon: <Lightbulb className="h-5 w-5" /> },
+  { label: "Final Checklist", href: "#checklist", icon: <Shield className="h-5 w-5" /> },
+];
+
+const powerWords = [
+  "Achieved", "Spearheaded", "Optimized", "Launched", "Negotiated",
+  "Streamlined", "Mentored", "Transformed", "Orchestrated", "Delivered",
+  "Pioneered", "Exceeded", "Accelerated", "Revolutionized", "Elevated",
+  "Architected", "Simplified", "Unified", "Amplified", "Maximized",
+];
+
 export default function GuidePage() {
   return (
     <>
@@ -37,15 +62,12 @@ export default function GuidePage() {
             headline:
               "Master Resume Writing: The Complete 2025 Guide to Getting Past ATS & Landing Interviews",
             description:
-              "Comprehensive guide to writing resumes that pass ATS systems and impress recruiters. Learn formatting, keyword optimization, power verbs, common mistakes, and industry-specific tips.",
+              "Comprehensive guide to writing resumes that pass ATS systems and impress recruiters.",
             url: "https://onlyresume.vercel.app/guide",
             image: "https://onlyresume.vercel.app/opengraph-image.png",
             datePublished: "2026-04-25",
             dateModified: "2026-04-25",
-            author: {
-              "@type": "Organization",
-              name: "OnlyResume",
-            },
+            author: { "@type": "Organization", name: "OnlyResume" },
             publisher: {
               "@type": "Organization",
               name: "OnlyResume",
@@ -54,335 +76,391 @@ export default function GuidePage() {
                 url: "https://onlyresume.vercel.app/icon.png",
               },
             },
-          }).replace(/</g, "\\u003c"),
+          }),
         }}
       />
-      <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-        <header className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight text-primary sm:text-4xl">
-            Master Resume Writing: The Complete 2025 Guide to Getting Past ATS &
-            Landing Interviews
-          </h1>
-          <p className="mt-3 text-base text-foreground sm:mt-4 sm:text-lg">
-            Learn proven strategies to craft a resume that defeats Applicant
-            Tracking Systems, impresses human recruiters, and wins you job
-            interviews.
-          </p>
-        </header>
 
-        <div className="prose-custom mt-8 space-y-8 text-foreground sm:mt-12 sm:space-y-10">
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Why Your Resume Is Your Career Breakthrough Tool
-            </h2>
-            <p>
-              Your resume is the gateway to your next opportunity. In a
-              competitive job market where recruiters often receive hundreds of
-              applications per opening, your resume must accomplish two critical
-              tasks: first, it must pass through an Applicant Tracking System
-              (ATS) designed to filter applications; second, it must compel a
-              human recruiter to pick up the phone and call you.
-            </p>
-            <p>
-              Research shows that recruiters spend an average of just 6-7
-              seconds on an initial resume scan. This isn&apos;t enough time to
-              read your entire document—it&apos;s barely enough to get a first
-              impression. This is why resume strategy matters more than ever.
-              Every element, from your formatting choices to your word
-              selection, must work in harmony to communicate value quickly and
-              effectively.
-            </p>
-            <p>
-              Beyond the human reviewer, your resume must be machine-readable.
-              Applicant Tracking Systems use algorithms to parse resume content,
-              extract information, and rank candidates based on keyword matches.
-              An ATS-unfriendly resume, no matter how impressive, often ends up
-              discarded before any human sees it. Studies estimate that ATS
-              systems automatically reject up to 75% of applications before a
-              human ever reviews them.
-            </p>
-          </section>
+      <PageHero
+        eyebrow="Resume Mastery"
+        title={
+          <>
+            The complete guide to{" "}
+            <span className="text-accent">ATS-winning resumes</span>
+          </>
+        }
+        description="Learn proven strategies to craft a resume that defeats Applicant Tracking Systems, impresses human recruiters, and wins you job interviews."
+      />
 
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Understanding Resume Formats: Which One Is Right for You?
-            </h2>
-            <p>
-              Choosing the right resume format sets the foundation for your
-              success. Each format serves different career situations and tells
-              a different story about your professional journey.
+      {/* Quick Nav */}
+      <section className="border-y border-border bg-surface py-8 sm:py-10">
+        <AnimatedSection animation="fade-up" as="div">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <p className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-accent">
+              Jump to section
             </p>
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Reverse-Chronological Format: The Recruiter's Favorite
-            </h3>
-            <p>
-              This is the most widely used and most highly recommended format
-              for good reason. It lists your most recent position first and
-              works backward through your career history. This format clearly
-              demonstrates career progression and gives recruiters an immediate
-              sense of your current skill level and recent experience.
-            </p>
-            <p>
-              The reverse-chronological format is ideal if you have consistent
-              employment with a clear career trajectory. It&apos;s also the
-              format most familiar to both ATS systems and human recruiters. If
-              you&apos;re uncertain about which format to use, this is almost
-              always the safe choice.
-            </p>
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Functional Format: Highlighting Skills Over Timeline
-            </h3>
-            <p>
-              The functional format organizes your experience by skill
-              categories rather than chronologically. It emphasizes what you can
-              do rather than when you did it. This format can be valuable for
-              career changers, those with significant employment gaps, or people
-              with diverse experiences that don&apos;t fit neatly into a
-              traditional timeline.
-            </p>
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Combination Format: Blending the Best of Both
-            </h3>
-            <p>
-              The combination format leads with a skills summary, then follows
-              with reverse-chronological work history. This approach allows you
-              to showcase your strongest qualifications upfront while still
-              maintaining the ATS-friendly structure recruiters expect.
-            </p>
-          </section>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              {quickNav.map((item, i) => (
+                <AnimatedSection
+                  key={item.href}
+                  animation="scale-in"
+                  delay={i * 60}
+                  as="div"
+                  className="inline-block"
+                >
+                  <Link
+                    href={item.href}
+                    className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-all hover:border-accent/30 hover:shadow-md sm:p-4"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center vinegarred-lg bg-accent/10 text-accent">
+                      {item.icon}
+                    </div>
+                    <span className="text-xs font-semibold text-primary sm:text-sm">
+                      {item.label}
+                    </span>
+                  </Link>
+                </AnimatedSection>
+              ))}
+            </div>
+          </div>
+        </AnimatedSection>
+      </section>
 
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Building Your Resume: Section by Section
-            </h2>
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+        {/* Why Your Resume Matters */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="intro" className="scroll-mt-24">
+            <SectionHeader
+              align="left"
+              title="Why your resume is your career breakthrough tool"
+            />
+            <div className="mt-6 space-y-4 text-foreground">
+              <p className="leading-relaxed">
+                Your resume is the gateway to your next opportunity. In a competitive job market where recruiters often receive hundreds of applications per opening, your resume must accomplish two critical tasks: first, it must pass through an Applicant Tracking System (ATS); second, it must compel a human recruiter to pick up the phone.
+              </p>
+              <p className="leading-relaxed">
+                Research shows that recruiters spend an average of just 6-7 seconds on an initial resume scan. This is not enough time to read your entire document — it is barely enough to get a first impression. This is why resume strategy matters more than ever.
+              </p>
+            </div>
 
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Contact Information: Make It Findable
-            </h3>
-            <p>
-              Your contact section sits at the top of your resume and should
-              include your full name, professional email address, phone number,
-              city/state, and LinkedIn URL (if current and professional). Modern
-              best practice does not include your full street address—city and
-              state are sufficient.
-            </p>
-
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Professional Summary: Your Value Proposition
-            </h3>
-            <p>
-              A professional summary replaces the outdated &quot;Objective&quot;
-              statement. This 2-3 sentence section sits immediately below your
-              contact info and articulates your unique value. It answers the
-              question: &quot;Why should this company hire me?&quot; Focus on
-              what you bring to the employer, not what you want from them.
-            </p>
-
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Work Experience: Quantify, Quantify, Quantify
-            </h3>
-            <p>
-              Your work experience section is the heart of your resume. For each
-              position, include your job title, company name, employment dates
-              (month and year), and 3-5 bullet points describing your key
-              achievements. Begin each bullet with a strong action verb. Most
-              importantly, quantify your accomplishments with percentages,
-              dollar amounts, or raw numbers.
-            </p>
-
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Education: Degree, School, Dates
-            </h3>
-            <p>
-              List your degrees in reverse chronological order. Include the
-              degree type (B.A., B.S., M.B.A.), institution name, and graduation
-              date. For recent graduates (within 3 years), include your GPA if
-              it&apos;s above 3.5.
-            </p>
-
-            <h3 className="mt-4 text-xl font-semibold text-primary">
-              Skills: Tailor to the Job
-            </h3>
-            <p>
-              Include 10-15 relevant skills divided into technical skills and
-              soft skills. This section is where you incorporate keywords from
-              the job description. If the job posting mentions &quot;project
-              management,&quot; use that exact phrase—don&apos;t just write
-              &quot;PM.&quot;
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Defeating ATS Systems: The Technical Checklist
-            </h2>
-            <p>
-              Applicant Tracking Systems have become gatekeepers in modern
-              recruiting. Here&apos;s how to ensure your resume makes it
-              through:
-            </p>
-            <ul className="mt-3 list-disc space-y-2 pl-6">
-              <li>
-                <strong>Use standard section headings:</strong> Stick with
-                recognizable labels like &quot;Work Experience,&quot;
-                &quot;Education,&quot; and &quot;Skills.&quot;
-              </li>
-              <li>
-                <strong>Avoid tables, columns, and text boxes:</strong> ATS
-                software struggles with complex layouts. Use a simple
-                single-column or two-column design.
-              </li>
-              <li>
-                <strong>Mirror job posting language:</strong> If the posting
-                says &quot;project management,&quot; use those exact words.
-              </li>
-              <li>
-                <strong>Save as PDF:</strong> PDF is the universally accepted
-                format that preserves your formatting.
-              </li>
-              <li>
-                <strong>Use standard fonts:</strong> Arial, Calibri, Helvetica,
-                Times New Roman, and Garamond are all ATS-safe.
-              </li>
-              <li>
-                <strong>Place critical info in body text:</strong> Many ATS
-                tools skip headers and footers.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Power Words That Command Attention
-            </h2>
-            <p>
-              The language you choose shapes how recruiters perceive your
-              accomplishments. Replace weak passive verbs with powerful action
-              verbs that demonstrate impact and ownership.
-            </p>
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {[
-                "Achieved",
-                "Spearheaded",
-                "Optimized",
-                "Launched",
-                "Negotiated",
-                "Streamlined",
-                "Mentored",
-                "Transformed",
-                "Orchestrated",
-                "Delivered",
-                "Pioneered",
-                "Exceeded",
-                "Accelerated",
-                "Revolutionized",
-                "Elevated",
-                "Architected",
-              ].map((word) => (
+                { label: "ATS reject rate", value: "75%" },
+                { label: "Avg scan time", value: "6-7 sec" },
+                { label: "Pages for mid-career", value: "2 max" },
+                { label: "Templates available", value: "20" },
+              ].map((stat) => (
+                <AnimatedSection
+                  key={stat.label}
+                  animation="scale-in"
+                  delay={100}
+                  as="div"
+                >
+                  <div className="rounded-xl border border-border bg-surface p-4 text-center">
+                    <div className="text-2xl font-extrabold text-accent">
+                      {stat.value}
+                    </div>
+                    <div className="mt-1 text-sm text-foreground">
+                      {stat.label}
+                    </div>
+                  </div>
+                </AnimatedSection>
+              ))}
+            </div>
+          </section>
+        </AnimatedSection>
+
+        {/* Resume Formats */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="formats" className="scroll-mt-24 pt-12 sm:pt-16">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <FileText className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary sm:text-3xl">
+                Resume Formats
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Reverse-Chronological Format: The Recruiter's Favorite",
+                  desc: "The most widely used and most highly recommended format. It lists your most recent position first and works backward through your career history.",
+                  bestFor: "Ideal if you have consistent employment with a clear career trajectory.",
+                  tag: "Recommended",
+                },
+                {
+                  title: "Functional Format: Highlighting Skills Over Timeline",
+                  desc: "Organizes your experience by skill categories rather than chronologically. Emphasizes what you can do rather than when you did it.",
+                  bestFor: "Career changers, those with employment gaps, or people with diverse experiences.",
+                  tag: null,
+                },
+                {
+                  title: "Combination Format: Blending the Best of Both",
+                  desc: "Leads with a skills summary, then follows with reverse-chronological work history.",
+                  bestFor: "Mid-career professionals looking to emphasize specific skill sets.",
+                  tag: null,
+                },
+              ].map((format, i) => (
+                <AnimatedSection
+                  key={format.title}
+                  animation="fade-up"
+                  delay={i * 100}
+                  as="div"
+                >
+                  <div className="relative rounded-2xl border border-border bg-surface p-6 sm:p-8">
+                    {format.tag && (
+                      <span className="absolute right-4 top-4 rounded-full bg-accent/10 px-3 py-1 text-xs font-bold text-accent">
+                        {format.tag}
+                      </span>
+                    )}
+                    <h3 className="text-lg font-bold text-primary sm:text-xl">
+                      {format.title}
+                    </h3>
+                    <p className="mt-3 leading-relaxed text-foreground">
+                      {format.desc}
+                    </p>
+                    <p className="mt-3 text-sm font-medium italic text-foreground/80">
+                      {format.bestFor}
+                    </p>
+                  </div>
+                </AnimatedSection>
+              ))}
+            </div>
+          </section>
+        </AnimatedSection>
+
+        {/* Section by Section */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="sections" className="scroll-mt-24 pt-12 sm:pt-16">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary sm:text-3xl">
+                Building Your Resume Section by Section
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Contact Information: Make It Findable",
+                  desc: "Your contact section sits at the top and should include your full name, professional email, phone number, city/state, and LinkedIn URL.",
+                },
+                {
+                  title: "Professional Summary: Your Value Proposition",
+                  desc: "A professional summary replaces the outdated 'Objective' statement. This 2-3 sentence section articulates your unique value.",
+                },
+                {
+                  title: "Work Experience: Quantify, Quantify, Quantify",
+                  desc: "Your work experience section is the heart of your resume. For each position, include your job title, company name, dates, and 3-5 bullet points.",
+                },
+                {
+                  title: "Education: Degree, School, Dates",
+                  desc: "List your degrees in reverse chronological order. Include the degree type, institution name, and graduation date.",
+                },
+                {
+                  title: "Skills: Tailor to the Job",
+                  desc: "Include 10-15 relevant skills. This is where you incorporate keywords from the job description.",
+                },
+              ].map((section, i) => (
+                <AnimatedSection
+                  key={section.title}
+                  animation="fade-up"
+                  delay={i * 80}
+                  as="div"
+                >
+                  <div className="rounded-xl border border-border bg-surface p-5 transition-all hover:border-accent/20 sm:p-6">
+                    <h3 className="text-base font-bold text-primary sm:text-lg">
+                      {section.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-foreground sm:text-base">
+                      {section.desc}
+                    </p>
+                  </div>
+                </AnimatedSection>
+              ))}
+            </div>
+          </section>
+        </AnimatedSection>
+
+        {/* ATS Checklist */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="ats" className="scroll-mt-24 pt-12 sm:pt-16">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Check className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary sm:text-3xl">
+                Defeating ATS Systems
+              </h2>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+              <p className="leading-relaxed text-foreground">
+                Applicant Tracking Systems have become gatekeepers in modern recruiting. Here is the technical checklist to ensure your resume passes through:
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {[
+                  "Use standard section headings like 'Work Experience' and 'Education'",
+                  "Avoid tables, columns, and text boxes — they confuse ATS",
+                  "Mirror job posting language exactly for keyword matching",
+                  "Save as PDF — universally accepted and preserves formatting",
+                  "Use standard fonts: Arial, Calibri, Helvetica, Times New Roman",
+                  "Place critical info in body text — headers/footers may be skipped",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                      <Check className="h-3 w-3" />
+                    </div>
+                    <p className="text-sm text-foreground sm:text-base">
+                      {item}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </AnimatedSection>
+
+        {/* Power Words */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="power-words" className="scroll-mt-24 pt-12 sm:pt-16">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary sm:text-3xl">
+                Power Words That Command Attention
+              </h2>
+            </div>
+
+            <p className="leading-relaxed text-foreground">
+              The language you choose shapes how recruiters perceive your accomplishments. Replace weak passive verbs with powerful action verbs that demonstrate impact and ownership.
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+              {powerWords.map((word) => (
                 <span
                   key={word}
-                  className="rounded bg-accent/10 px-3 py-1.5 text-center text-sm font-medium text-accent"
+                  className="rounded-lg bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
                 >
                   {word}
                 </span>
               ))}
             </div>
           </section>
+        </AnimatedSection>
 
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Mistakes That Cost You Opportunities
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-6">
-              <li>
-                <strong>Spelling and grammar errors:</strong> Even one typo
-                signals carelessness. Proofread multiple times.
-              </li>
-              <li>
-                <strong>Unprofessional email address:</strong> If your email
-                raises eyebrows, create a new professional one immediately.
-              </li>
-              <li>
-                <strong>Including irrelevant experience:</strong> For senior
-                roles, cut the high school summer job. Every line should add
-                value.
-              </li>
-              <li>
-                <strong>Excessive length:</strong> One page for entry-level, two
-                pages maximum for anyone else.
-              </li>
-              <li>
-                <strong>Vague descriptions:</strong> &quot;Hard worker&quot; and
-                &quot;team player&quot; are clichés without evidence.
-              </li>
-              <li>
-                <strong>Inconsistent formatting:</strong> If one job title is
-                bold, they all should be.
-              </li>
-              <li>
-                <strong>Using personal pronouns:</strong> Avoid &quot;I,&quot;
-                &quot;me,&quot; and &quot;we.&quot; Write &quot;Led a team of
-                8&quot; not &quot;I led a team of 8.&quot;
-              </li>
-            </ul>
+        {/* Mistakes */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="mistakes" className="scroll-mt-24 pt-12 sm:pt-16">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Lightbulb className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary sm:text-3xl">
+                Mistakes That Cost Opportunities
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                { title: "Spelling and grammar errors", desc: "Even one typo signals carelessness. Proofread multiple times." },
+                { title: "Unprofessional email address", desc: "If your email raises eyebrows, create a new professional one immediately." },
+                { title: "Including irrelevant experience", desc: "For senior roles, cut the high school summer job. Every line should add value." },
+                { title: "Excessive length", desc: "One page for entry-level, two pages maximum for anyone else." },
+                { title: "Vague descriptions", desc: "'Hard worker' and 'team player' are cliches without evidence." },
+                { title: "Inconsistent formatting", desc: "If one job title is bold, they all should be." },
+              ].map((mistake, i) => (
+                <AnimatedSection
+                  key={mistake.title}
+                  animation="slide-left"
+                  delay={i * 80}
+                  as="div"
+                >
+                  <div className="flex items-start gap-4 rounded-xl border border-border bg-surface p-5 transition-all hover:border-accent/20 sm:p-6">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
+                      <span className="text-sm font-bold">{i + 1}</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-primary">
+                        {mistake.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-foreground sm:text-base">
+                        {mistake.desc}
+                      </p>
+                    </div>
+                  </div>
+                </AnimatedSection>
+              ))}
+            </div>
           </section>
+        </AnimatedSection>
 
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              The Optimal Resume Length
-            </h2>
-            <p>
-              How long should your resume be? Entry-level candidates and recent
-              graduates should aim for one page. Mid-career professionals (5-15
-              years) typically use two pages. Senior professionals may need
-              additional space, but brevity is always preferable. Every line
-              must earn its place—ruthlessly cut anything that doesn&apos;t
-              demonstrate clear value.
+        {/* Final Checklist */}
+        <AnimatedSection animation="fade-up" as="div">
+          <section id="checklist" className="scroll-mt-24 pt-12 sm:pt-16">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Shield className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary sm:text-3xl">
+                Your Pre-Submit Checklist
+              </h2>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  "Included relevant keywords from the job posting",
+                  "All dates, titles, and company names 100% accurate",
+                  "Quantified at least two achievements per position",
+                  "Formatting consistent throughout the entire document",
+                  "Proofread thoroughly for spelling and grammar",
+                  "File saved as PDF with a professional filename",
+                  "Core value identifiable in the first 6 seconds",
+                  "All personal pronouns (I, me, we) removed",
+                  "Every bullet point shows measurable impact",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-accent/30 text-accent">
+                      <Check className="h-3 w-3" />
+                    </div>
+                    <span className="text-sm text-foreground sm:text-base">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </AnimatedSection>
+
+        {/* 20 Templates Note */}
+        <AnimatedSection animation="scale-in" as="div">
+          <div className="mt-12 rounded-2xl border border-accent/20 bg-accent/5 p-6 text-center sm:p-8">
+            <p className="text-base font-semibold text-primary sm:text-lg">
+              Put this guide into practice with any of our 20 ATS-friendly resume templates
             </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Your Pre-Submit Resume Checklist
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-6">
-              <li>Have I included relevant keywords from the job posting?</li>
-              <li>Are all dates, titles, and company names 100% accurate?</li>
-              <li>Have I quantified at least two achievements per position?</li>
-              <li>
-                Is the formatting consistent throughout the entire document?
-              </li>
-              <li>
-                Have I proofread thoroughly for spelling, grammar, and
-                punctuation?
-              </li>
-              <li>Is the file saved as PDF with a professional filename?</li>
-              <li>
-                Can a recruiter identify my core value in the first 6 seconds?
-              </li>
-              <li>Have I removed all personal pronouns (I, me, we)?</li>
-              <li>Does every bullet point show measurable impact?</li>
-            </ul>
-          </section>
-
-          <section className="rounded-xl border border-border bg-surface p-5 text-center sm:p-6">
-            <h2 className="text-xl font-bold text-primary sm:text-2xl">
-              Ready to Build Your Professional Resume?
-            </h2>
-            <p className="mt-2">
-              Apply these proven strategies using our free resume builder.
-              Choose from three ATS-friendly templates and download your resume
-              instantly.
-            </p>
-            <a
-              href="/builder"
-              className="mt-4 inline-flex h-10 items-center rounded-lg bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
-            >
-              Start Building Your Resume
-            </a>
-          </section>
-        </div>
-      </article>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link
+                href="/templates"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+              >
+                Browse Templates
+              </Link>
+              <Link
+                href="/builder"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-surface px-6 text-sm font-semibold text-primary transition-colors hover:bg-background"
+              >
+                Open Builder
+              </Link>
+            </div>
+          </div>
+        </AnimatedSection>
+      </div>
     </>
   );
 }
