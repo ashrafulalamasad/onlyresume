@@ -336,7 +336,7 @@ export default function AboutPage() {
       {/* 20 Templates Promo */}
       <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         <AnimatedSection animation="scale-in" as="div">
-          <div className="overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-accent/10 via-accent/5 to-transparent p-8 text-center sm:p-12 lg:p-16">
+          <div className="overflow-hidden rounded-3xl border border-border bg-linear-to-br from-accent/10 via-accent/5 to-transparent p-8 text-center sm:p-12 lg:p-16">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 text-accent">
               <Download className="h-8 w-8" />
             </div>

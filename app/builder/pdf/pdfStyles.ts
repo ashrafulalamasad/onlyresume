@@ -215,6 +215,73 @@ export const styles = StyleSheet.create({
     letterSpacing: 2,
   },
 
+  // Common sidebar shell shared by the two-column templates (Executive,
+  // Technical, Emerald, SidebarRight, Warm). Each template sets its own
+  // `backgroundColor`/`width` via inline style overrides.
+  panelContainer: {
+    flexDirection: "row" as const,
+    display: "flex",
+    width: "100%",
+  },
+
+  panelSidebar: {
+    width: 165,
+    padding: 12,
+    flexDirection: "column" as const,
+    display: "flex",
+    borderRadius: 4,
+  },
+
+  panelMain: {
+    flex: 1,
+    flexDirection: "column" as const,
+    display: "flex",
+    paddingLeft: 10,
+  },
+
+  // Section heading used by sidebar templates (Executive, Technical, Emerald,
+  // SidebarRight, Warm). The visual variant is achieved with an inline color.
+  sideHeading: {
+    fontSize: 8.5,
+    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.accent,
+    textTransform: "uppercase" as const,
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+
+  sideHeadingText: {
+    fontSize: 8.5,
+    fontWeight: FONT_WEIGHTS.bold,
+    textTransform: "uppercase" as const,
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+
+  sidePanelText: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.white,
+    marginBottom: SPACING.xs,
+    lineHeight: 1.25,
+  },
+
+  sidePanelTextInk: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
+    lineHeight: 1.25,
+  },
+
+  mainHeading: {
+    fontSize: 10,
+    fontWeight: FONT_WEIGHTS.bold,
+    textTransform: "uppercase" as const,
+    letterSpacing: 1.5,
+    paddingBottom: 3,
+    marginBottom: SPACING.xs,
+    marginTop: SPACING.sm,
+  },
+
   // Common elements
   bullet: {
     marginLeft: SPACING.md,

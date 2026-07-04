@@ -1454,7 +1454,6 @@ export default function BuilderClient() {
     } catch (error) {
       console.error("PDF download failed:", error);
       setShowModal(false);
-      window.print();
     }
   }, [data]);
 

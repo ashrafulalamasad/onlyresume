@@ -154,7 +154,7 @@ export default function Home() {
             href: "/builder",
             variant: undefined,
           },
-          { label: "Browse 20 Templates", href: "/templates", variant: "ghost" },
+          { label: "Browse All Templates", href: "/templates", variant: "ghost" },
         ]}
       />
 
@@ -236,7 +236,7 @@ export default function Home() {
                 href="/templates"
                 className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent/90 sm:text-base"
               >
-                Browse All 20+ Templates
+                Browse All Templates
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Link>
             </AnimatedSection>
